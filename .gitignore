@@ -1,0 +1,91 @@
+# Git ignore para proyecto .NET / Visual Studio / Rider
+# Basado en la plantilla oficial de GitHub para VisualStudio / .NET
+
+## Build output
+bin/
+obj/
+
+## Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+## Rider
+.idea/
+*.sln.iml
+
+## Visual Studio Code
+.vscode/
+
+## NuGet
+*.nupkg
+# The packages folder can be ignored because of PackageReference
+packages/
+project.lock.json
+project.fragment.lock.json
+
+## NuGet v3
+project.assets.json
+
+## ASP.NET / user-specific
+appsettings.Development.json
+appsettings.*.Local.json
+secrets.json
+*.db
+
+## Publish output
+publish/
+*.Publish.xml
+
+## Azure Functions
+bin/Release/net*/publish
+
+## Test result files
+TestResults/
+*.trx
+
+## Resharper
+_ReSharper*/
+*.DotSettings.user
+
+## DotCover
+*.dcvr
+
+## StyleCop
+StyleCopReport.xml
+
+## Logs
+*.log
+
+## Generated files
+*.g.cs
+*.generated.cs
+
+## JetBrains Rider caches
+.idea/
+.idea/**/workspace.xml
+
+## MSBuild
+*.user
+*.cache
+
+## Rider local history
+.localhistory/
+
+# Jet artifacts
+*.vsix
+
+# Others
+*.cache
+*.pid
+*.seed
+
+# Ignore user-specific project files
+**/*.user
+
+# Ignore entrypoint user file in this repo (exists in workspace)
+EntryPoint/EntryPoint.csproj.user
+
+# End of file
