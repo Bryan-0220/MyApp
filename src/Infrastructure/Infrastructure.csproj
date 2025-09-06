@@ -5,5 +5,10 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="MongoDB.Driver" Version="3.4.3" />
+    <ProjectReference Include="..\Core\Application\Application.csproj" />
+    <ProjectReference Include="..\Core\Domain\Domain.csproj" />
+  </ItemGroup>
 
 </Project>
