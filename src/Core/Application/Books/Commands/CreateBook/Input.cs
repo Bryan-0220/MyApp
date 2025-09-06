@@ -1,10 +1,6 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace Application.Books.Commands.CreateBook
+namespace CreateBook
 {
-    public class CreateBookCommand
+    public class CreateBookCommandInput
     {
         public string Title { get; set; } = string.Empty;
         public string AuthorId { get; set; } = string.Empty;
