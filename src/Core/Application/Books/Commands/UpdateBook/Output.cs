@@ -1,12 +1,12 @@
-namespace Application.Books.Commands.UpdateBook
+namespace UpdateBook
 {
-    public class UpdateBookCommand
+    public class UpdateBookCommandOutput
     {
         public string Id { get; set; } = string.Empty;
         public string? Title { get; set; }
         public string? AuthorId { get; set; }
         public string? ISBN { get; set; }
         public int? PublishedYear { get; set; }
-        public int? CopiesAvailable { get; set; }
+        public int CopiesAvailable { get; set; }
     }
 }
