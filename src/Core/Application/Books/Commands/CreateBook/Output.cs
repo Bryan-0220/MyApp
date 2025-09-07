@@ -8,5 +8,6 @@ namespace CreateBook
         public string? ISBN { get; set; }
         public int? PublishedYear { get; set; }
         public int CopiesAvailable { get; set; }
+        public string Genre { get; set; } = string.Empty;
     }
 }

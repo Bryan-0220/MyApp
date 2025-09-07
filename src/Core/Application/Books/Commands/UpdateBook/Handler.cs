@@ -60,6 +60,9 @@ namespace UpdateBook
 
             if (input.CopiesAvailable.HasValue && input.CopiesAvailable.Value != -1)
                 existing.SetCopiesAvailable(input.CopiesAvailable.Value);
+
+            if (!string.IsNullOrWhiteSpace(input.Genre) && input.Genre != "string")
+                existing.SetGenre(input.Genre!.Trim());
         }
     }
 }
