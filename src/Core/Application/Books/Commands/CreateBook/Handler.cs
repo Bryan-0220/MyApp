@@ -23,7 +23,7 @@ namespace CreateBook
             Book book;
             try
             {
-                book = Book.Create(input.Title, input.AuthorId, input.ISBN, input.PublishedYear, input.CopiesAvailable);
+                book = Book.Create(input.Title, input.AuthorId, input.ISBN, input.PublishedYear, input.CopiesAvailable, input.Genre);
             }
             catch (DomainException ex)
             {
@@ -39,7 +39,9 @@ namespace CreateBook
                 AuthorId = created.AuthorId,
                 ISBN = created.ISBN,
                 PublishedYear = created.PublishedYear,
-                CopiesAvailable = created.CopiesAvailable
+                CopiesAvailable = created.CopiesAvailable,
+                Genre = created.Genre
+
             };
         }
     }
