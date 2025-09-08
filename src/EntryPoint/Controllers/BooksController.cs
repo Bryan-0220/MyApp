@@ -45,7 +45,6 @@ namespace EntryPoint.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(string id, [FromBody] UpdateBookCommandInput input)
         {
-            // ensure the id from route is used
             input.Id = id;
             var updated = await _updateBookHandler.HandleAsync(input, HttpContext.RequestAborted);
             if (updated is null) return NotFound();

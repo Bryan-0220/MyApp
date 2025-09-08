@@ -34,8 +34,7 @@ namespace Infrastructure.Repositories
             return await cursor.ToListAsync(ct);
         }
 
-        // Basic name/nationality/genre filter helper
-        public async Task<IEnumerable<Author>> FilterAsync(string? name = null, string? nationality = null, string? genre = null, CancellationToken ct = default)
+        public async Task<IEnumerable<Author>> FilterAsync(string? name = null, string? nationality = null, System.Collections.Generic.IEnumerable<string>? genres = null, CancellationToken ct = default)
         {
             var builder = Builders<Author>.Filter;
             var f = builder.Empty;
@@ -44,8 +43,8 @@ namespace Infrastructure.Repositories
                 f = f & builder.Regex(a => a.Name, new MongoDB.Bson.BsonRegularExpression(name, "i"));
             if (!string.IsNullOrWhiteSpace(nationality))
                 f = f & builder.Eq(a => a.Nationality, nationality);
-            if (!string.IsNullOrWhiteSpace(genre))
-                f = f & builder.Eq("Genres", genre);
+            if (genres != null && System.Linq.Enumerable.Any(genres))
+                f = f & builder.All(a => a.Genres, genres);
 
             var cursor = await _authors.FindAsync(f, cancellationToken: ct);
             return await cursor.ToListAsync(ct);

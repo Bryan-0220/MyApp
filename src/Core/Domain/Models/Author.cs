@@ -10,14 +10,11 @@ namespace Domain.Models
         public string Name { get; private set; } = string.Empty;
         public string? Bio { get; private set; }
 
-        // Nueva propiedad: nacionalidad
         public string Nationality { get; private set; } = string.Empty;
 
-        // Fechas de nacimiento y muerte (opcional)
         public DateTime? BirthDate { get; private set; }
         public DateTime? DeathDate { get; private set; }
 
-        // Conjunto de géneros literarios
         public HashSet<string> Genres { get; private set; } = new(StringComparer.OrdinalIgnoreCase);
 
         public Author() { }
