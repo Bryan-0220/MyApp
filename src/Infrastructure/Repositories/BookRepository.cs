@@ -13,7 +13,6 @@ namespace Infrastructure.Repositories
         public BookRepository(IMongoDatabase database)
         {
             _books = database.GetCollection<Book>("books");
-            // Index creation intentionally removed; index management should be done separately in the database.
         }
 
         public async Task<Book> CreateAsync(Book entity, CancellationToken ct = default)
