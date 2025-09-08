@@ -6,8 +6,8 @@ namespace CreateAuthor
         public string Name { get; set; } = string.Empty;
         public string? Bio { get; set; }
         public string? Nationality { get; set; }
-        public System.DateTime? BirthDate { get; set; }
-        public System.DateTime? DeathDate { get; set; }
-        public System.Collections.Generic.IEnumerable<string> Genres { get; set; } = System.Array.Empty<string>();
+        public DateTime? BirthDate { get; set; }
+        public DateTime? DeathDate { get; set; }
+        public IEnumerable<string> Genres { get; set; } = System.Array.Empty<string>();
     }
 }
