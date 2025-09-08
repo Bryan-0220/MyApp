@@ -1,11 +1,22 @@
 using System;
 using System.Linq.Expressions;
 using Domain.Models;
+using FilterBooks;
 
 namespace Application.Filters
 {
     public static class BookFilterExtensions
     {
+        public static BookFilter ToBookFilter(this FilterBooksQueryInput? input)
+        {
+            if (input is null) return new BookFilter();
+
+            return new BookFilter
+            {
+                Genre = string.IsNullOrWhiteSpace(input.Genre) ? null : input.Genre
+            };
+        }
+
         public static Expression<Func<Book, bool>>? ToExpression(this BookFilter? filter)
         {
             if (filter is null) return null;

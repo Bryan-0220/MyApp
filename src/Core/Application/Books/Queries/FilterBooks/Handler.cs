@@ -19,10 +19,8 @@ namespace FilterBooks
         {
             await _validator.ValidateAndThrowAsync(input, ct);
 
-            var books = await _bookRepository.FilterAsync(new BookFilter
-            {
-                Genre = input.Genre
-            }.ToExpression(), ct);
+            var filter = input.ToBookFilter();
+            var books = await _bookRepository.FilterAsync(filter.ToExpression(), ct);
 
             return books.Select(book => new FilterBooksQueryOutput
             {
