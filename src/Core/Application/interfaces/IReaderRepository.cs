@@ -2,7 +2,7 @@ using Domain.Models;
 
 namespace Application.Interfaces
 {
-    public interface IUserRepository : IRepository<User>
+    public interface IReaderRepository : IRepository<Reader>
     {
     }
 }
