@@ -3,6 +3,7 @@ using Domain.Models;
 using Application.Filters;
 using Application.Interfaces;
 using MongoDB.Driver;
+using MongoDB.Bson;
 
 namespace Infrastructure.Repositories
 {
@@ -34,17 +35,38 @@ namespace Infrastructure.Repositories
             return await cursor.ToListAsync(ct);
         }
 
-        public async Task<IEnumerable<Author>> FilterAsync(string? name = null, string? nationality = null, System.Collections.Generic.IEnumerable<string>? genres = null, CancellationToken ct = default)
+        // public async Task<IEnumerable<Author>> FilterAsync(string? name = null, string? nationality = null, System.Collections.Generic.IEnumerable<string>? genres = null, CancellationToken ct = default)
+        // {
+        //     var builder = Builders<Author>.Filter;
+        //     var f = builder.Empty;
+
+        //     if (!string.IsNullOrWhiteSpace(name))
+        //         f = f & builder.Regex(a => a.Name, new MongoDB.Bson.BsonRegularExpression(name, "i"));
+        //     if (!string.IsNullOrWhiteSpace(nationality))
+        //         f = f & builder.Eq(a => a.Nationality, nationality);
+        //     if (genres != null && System.Linq.Enumerable.Any(genres))
+        //         f = f & builder.All(a => a.Genres, genres);
+
+        //     var cursor = await _authors.FindAsync(f, cancellationToken: ct);
+        //     return await cursor.ToListAsync(ct);
+        // }
+
+        public async Task<IEnumerable<Author>> FilterAsync(AuthorFilter? filter = null, CancellationToken ct = default)
         {
             var builder = Builders<Author>.Filter;
             var f = builder.Empty;
 
-            if (!string.IsNullOrWhiteSpace(name))
-                f = f & builder.Regex(a => a.Name, new MongoDB.Bson.BsonRegularExpression(name, "i"));
-            if (!string.IsNullOrWhiteSpace(nationality))
-                f = f & builder.Eq(a => a.Nationality, nationality);
-            if (genres != null && System.Linq.Enumerable.Any(genres))
-                f = f & builder.All(a => a.Genres, genres);
+            if (filter != null)
+            {
+                if (!string.IsNullOrWhiteSpace(filter.Name))
+                    f = f & builder.Regex(a => a.Name, new BsonRegularExpression(filter.Name, "i"));
+                if (!string.IsNullOrWhiteSpace(filter.Id))
+                    f = f & builder.Eq(a => a.Id, filter.Id);
+                if (filter.BirthYear.HasValue)
+                    f = f & builder.Eq(a => a.BirthDate.HasValue ? a.BirthDate.Value.Year : -1, filter.BirthYear.Value);
+                if (filter.Genres != null && System.Linq.Enumerable.Any(filter.Genres))
+                    f = f & builder.All(a => a.Genres, filter.Genres);
+            }
 
             var cursor = await _authors.FindAsync(f, cancellationToken: ct);
             return await cursor.ToListAsync(ct);

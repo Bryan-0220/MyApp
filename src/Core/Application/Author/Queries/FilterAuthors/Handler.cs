@@ -1,5 +1,6 @@
 using Application.Interfaces;
 using FluentValidation;
+using Application.Filters;
 
 namespace FilterAuthors
 {
@@ -18,7 +19,15 @@ namespace FilterAuthors
         {
             await _validator.ValidateAndThrowAsync(input, ct);
 
-            var authors = await _authorRepository.FilterAsync(input.Name, input.Nationality, input.Genres, ct);
+            var cleanedGenres = input.Genres?.Where(g => !string.IsNullOrWhiteSpace(g)).Select(g => g.Trim()).ToArray();
+
+            var filter = new AuthorFilter
+            {
+                Name = input.Name?.Trim(),
+                Genres = cleanedGenres != null && cleanedGenres.Length > 0 ? cleanedGenres : null
+            };
+
+            var authors = await _authorRepository.FilterAsync(filter, ct);
 
             return authors.Select(a => new FilterAuthorsQueryOutput
             {
