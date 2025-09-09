@@ -3,120 +3,95 @@ using Domain.Models;
 using Application.Filters;
 using Application.Interfaces;
 using MongoDB.Driver;
+using MongoDB.Bson;
 
 namespace Infrastructure.Repositories
 {
-    public class BookRepository : IBookRepository
+    public class ReaderRepository : IReaderRepository
     {
-        private readonly IMongoCollection<Book> _books;
+        private readonly IMongoCollection<Reader> _readers;
 
-        public BookRepository(IMongoDatabase database)
+        public ReaderRepository(IMongoDatabase database)
         {
-            _books = database.GetCollection<Book>("books");
+            _readers = database.GetCollection<Reader>("readers");
         }
 
-        public async Task<Book> CreateAsync(Book entity, CancellationToken ct = default)
+        public async Task<Reader> CreateAsync(Reader entity, CancellationToken ct = default)
         {
-            await _books.InsertOneAsync(entity, cancellationToken: ct);
+            await _readers.InsertOneAsync(entity, cancellationToken: ct);
             return entity;
         }
 
         public async Task<bool> DeleteAsync(string id, CancellationToken ct = default)
         {
-            var res = await _books.DeleteOneAsync(b => b.Id == id, ct);
+            var res = await _readers.DeleteOneAsync(r => r.Id == id, ct);
             return res.DeletedCount > 0;
         }
 
-        public async Task<IEnumerable<Book>> FilterAsync(BookFilter? filter = null, CancellationToken ct = default)
+        public async Task<IEnumerable<Reader>> FilterAsync(Expression<Func<Reader, bool>>? predicate = null, CancellationToken ct = default)
         {
-            var builder = Builders<Book>.Filter;
+            if (predicate == null)
+                return await (await _readers.FindAsync(Builders<Reader>.Filter.Empty, cancellationToken: ct)).ToListAsync(ct);
+
+            var cursor = await _readers.FindAsync(predicate, cancellationToken: ct);
+            return await cursor.ToListAsync(ct);
+        }
+
+        public async Task<IEnumerable<Reader>> FilterAsync(ReaderFilter? filter = null, CancellationToken ct = default)
+        {
+            var builder = Builders<Reader>.Filter;
             var f = builder.Empty;
 
             if (filter != null)
             {
-                if (!string.IsNullOrWhiteSpace(filter.Title))
-                    f = f & builder.Regex(b => b.Title, new MongoDB.Bson.BsonRegularExpression(filter.Title, "i"));
-                if (!string.IsNullOrWhiteSpace(filter.AuthorId))
-                    f = f & builder.Eq(b => b.AuthorId, filter.AuthorId);
-                if (!string.IsNullOrWhiteSpace(filter.Isbn))
-                    f = f & builder.Eq(b => b.ISBN, filter.Isbn);
-                if (filter.PublishedYear.HasValue)
-                    f = f & builder.Eq(b => b.PublishedYear, filter.PublishedYear.Value);
+                if (!string.IsNullOrWhiteSpace(filter.FirstName))
+                    f = f & builder.Regex(r => r.FirstName, new BsonRegularExpression(filter.FirstName, "i"));
 
-                if (filter.Available.HasValue)
-                {
-                    if (filter.Available.Value)
-                        f = f & builder.Gt(b => b.CopiesAvailable, 0);
-                    else
-                        f = f & builder.Lte(b => b.CopiesAvailable, 0);
-                }
+                if (!string.IsNullOrWhiteSpace(filter.LastName))
+                    f = f & builder.Regex(r => r.LastName, new BsonRegularExpression(filter.LastName, "i"));
             }
 
-            var cursor = await _books.FindAsync(f, cancellationToken: ct);
+            var cursor = await _readers.FindAsync(f, cancellationToken: ct);
             return await cursor.ToListAsync(ct);
         }
 
-        public async Task<IEnumerable<Book>> FilterAsync(Expression<Func<Book, bool>>? predicate = null, CancellationToken ct = default)
+        public async Task<IEnumerable<Reader>> GetAllAsync(CancellationToken ct = default)
         {
-            if (predicate == null) return await (await _books.FindAsync(Builders<Book>.Filter.Empty, cancellationToken: ct)).ToListAsync(ct);
-            var cursor = await _books.FindAsync(predicate, cancellationToken: ct);
+            var cursor = await _readers.FindAsync(Builders<Reader>.Filter.Empty, cancellationToken: ct);
             return await cursor.ToListAsync(ct);
         }
 
-        public async Task<IEnumerable<Book>> GetAllAsync(CancellationToken ct = default)
+        public async Task<Reader?> GetByIdAsync(string id, CancellationToken ct = default)
         {
-            var cursor = await _books.FindAsync(Builders<Book>.Filter.Empty, cancellationToken: ct);
-            return await cursor.ToListAsync(ct);
-        }
-
-        public async Task<Book?> GetByIdAsync(string id, CancellationToken ct = default)
-        {
-            var cursor = await _books.FindAsync(b => b.Id == id, cancellationToken: ct);
+            var cursor = await _readers.FindAsync(r => r.Id == id, cancellationToken: ct);
             return await cursor.FirstOrDefaultAsync(ct);
         }
 
-        public async Task<long> CountAsync(Expression<Func<Book, bool>>? predicate = null, CancellationToken ct = default)
+        public async Task<long> CountAsync(Expression<Func<Reader, bool>>? predicate = null, CancellationToken ct = default)
         {
-            if (predicate == null) return await _books.CountDocumentsAsync(Builders<Book>.Filter.Empty, cancellationToken: ct);
-            return await _books.CountDocumentsAsync(Builders<Book>.Filter.Where(predicate), cancellationToken: ct);
+            if (predicate == null) return await _readers.CountDocumentsAsync(Builders<Reader>.Filter.Empty, cancellationToken: ct);
+            return await _readers.CountDocumentsAsync(Builders<Reader>.Filter.Where(predicate), cancellationToken: ct);
         }
 
-        public async Task<IEnumerable<Book>> ListAsync(CancellationToken ct = default)
+        public async Task<IEnumerable<Reader>> ListAsync(CancellationToken ct = default)
         {
             return await GetAllAsync(ct);
         }
 
-        public async Task<bool> TryChangeCopiesAsync(string bookId, int delta, CancellationToken ct = default)
-        {
-            var update = Builders<Book>.Update.Inc(b => b.CopiesAvailable, delta);
-            var options = new FindOneAndUpdateOptions<Book>
-            {
-                ReturnDocument = ReturnDocument.After
-            };
-
-            var filter = Builders<Book>.Filter.And(
-                Builders<Book>.Filter.Eq(b => b.Id, bookId),
-                Builders<Book>.Filter.Gte(b => b.CopiesAvailable, Math.Max(0, -delta))
-            );
-
-            var updated = await _books.FindOneAndUpdateAsync(filter, update, options, ct);
-            return updated != null;
-        }
-
-        public async Task<bool> UpdateAsync(string id, Book entity, CancellationToken ct = default)
+        public async Task<bool> UpdateAsync(string id, Reader entity, CancellationToken ct = default)
         {
             try
             {
-                var res = await _books.ReplaceOneAsync(b => b.Id == id, entity, cancellationToken: ct);
+                var res = await _readers.ReplaceOneAsync(r => r.Id == id, entity, cancellationToken: ct);
                 return res.ModifiedCount > 0 || res.MatchedCount > 0;
             }
             catch (MongoWriteException ex) when (ex.WriteError?.Category == ServerErrorCategory.DuplicateKey)
             {
-                throw new InvalidOperationException("Ya existe un libro con ese ISBN.");
+                throw new InvalidOperationException("Duplicate key in readers collection.");
             }
         }
 
-        public async Task UpdateAsync(Book entity, CancellationToken ct = default)
+        public async Task UpdateAsync(Reader entity, CancellationToken ct = default)
         {
             await UpdateAsync(entity.Id, entity, ct);
         }
