@@ -35,22 +35,6 @@ namespace Infrastructure.Repositories
             return await cursor.ToListAsync(ct);
         }
 
-        // public async Task<IEnumerable<Author>> FilterAsync(string? name = null, string? nationality = null, System.Collections.Generic.IEnumerable<string>? genres = null, CancellationToken ct = default)
-        // {
-        //     var builder = Builders<Author>.Filter;
-        //     var f = builder.Empty;
-
-        //     if (!string.IsNullOrWhiteSpace(name))
-        //         f = f & builder.Regex(a => a.Name, new MongoDB.Bson.BsonRegularExpression(name, "i"));
-        //     if (!string.IsNullOrWhiteSpace(nationality))
-        //         f = f & builder.Eq(a => a.Nationality, nationality);
-        //     if (genres != null && System.Linq.Enumerable.Any(genres))
-        //         f = f & builder.All(a => a.Genres, genres);
-
-        //     var cursor = await _authors.FindAsync(f, cancellationToken: ct);
-        //     return await cursor.ToListAsync(ct);
-        // }
-
         public async Task<IEnumerable<Author>> FilterAsync(AuthorFilter? filter = null, CancellationToken ct = default)
         {
             var builder = Builders<Author>.Filter;

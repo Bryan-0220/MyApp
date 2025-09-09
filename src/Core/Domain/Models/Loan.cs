@@ -12,9 +12,9 @@ namespace Domain.Models
         public string Id { get; set; } = System.Guid.NewGuid().ToString();
         public string BookId { get; set; } = string.Empty;
         public string UserId { get; set; } = string.Empty;
-        public System.DateTime LoanDate { get; set; } = System.DateTime.UtcNow;
-        public System.DateTime DueDate { get; set; } = System.DateTime.UtcNow.AddDays(14);
-        public System.DateTime? ReturnedDate { get; set; }
+        // public System.DateOnly LoanDate { get; set; } = System.DateOnly.UtcNow;
+        // public System.DateOnly DueDate { get; set; } = System.DateOnly.UtcNow.AddDays(14);
+        public System.DateOnly? ReturnedDate { get; set; }
         public LoanStatus Status { get; set; } = LoanStatus.Active;
     }
 }
