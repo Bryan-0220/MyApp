@@ -16,6 +16,12 @@ using UpdateAuthor;
 using GetAllAuthors;
 using GetAuthorById;
 using FilterAuthors;
+using CreateReader;
+using DeleteReader;
+using UpdateReader;
+using GetAllReaders;
+using GetReaderById;
+using FilterReaders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +41,20 @@ builder.Services.AddScoped(sp =>
 builder.Services.AddScoped<IBookRepository, BookRepository>();
 
 builder.Services.AddScoped<IAuthorRepository, AuthorRepository>();
+
+builder.Services.AddScoped<IReaderRepository, ReaderRepository>();
+
+builder.Services.AddScoped<ICreateReaderCommandHandler, CreateReaderCommandHandler>();
+builder.Services.AddScoped<IGetReaderByIdQueryHandler, GetReaderByIdQueryHandler>();
+builder.Services.AddScoped<IGetAllReadersQueryHandler, GetAllReadersQueryHandler>();
+builder.Services.AddScoped<IDeleteReaderCommandHandler, DeleteReaderCommandHandler>();
+builder.Services.AddScoped<IUpdateReaderCommandHandler, UpdateReaderCommandHandler>();
+builder.Services.AddScoped<IFilterReadersQueryHandler, FilterReadersQueryHandler>();
+builder.Services.AddScoped<IValidator<CreateReaderCommandInput>, CreateReaderCommandValidator>();
+builder.Services.AddScoped<IValidator<DeleteReaderCommandInput>, DeleteReaderCommandValidator>();
+builder.Services.AddScoped<IValidator<UpdateReaderCommandInput>, UpdateReaderCommandValidator>();
+builder.Services.AddScoped<IValidator<GetReaderByIdQueryInput>, GetReaderByIdQueryValidator>();
+builder.Services.AddScoped<IValidator<FilterReadersQueryInput>, FilterReadersQueryValidator>();
 
 builder.Services.AddScoped<ICreateAuthorCommandHandler, CreateAuthorCommandHandler>();
 builder.Services.AddScoped<IGetAuthorByIdQueryHandler, GetAuthorByIdQueryHandler>();
