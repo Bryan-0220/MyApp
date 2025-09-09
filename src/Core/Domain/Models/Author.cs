@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using Domain.Common;
 
 namespace Domain.Models
@@ -12,14 +10,14 @@ namespace Domain.Models
 
         public string Nationality { get; private set; } = string.Empty;
 
-        public DateTime? BirthDate { get; private set; }
-        public DateTime? DeathDate { get; private set; }
+        public DateOnly? BirthDate { get; private set; }
+        public DateOnly? DeathDate { get; private set; }
 
         public HashSet<string> Genres { get; private set; } = new(StringComparer.OrdinalIgnoreCase);
 
         public Author() { }
 
-        public static Author Create(string name, string? bio = null, string? nationality = null, DateTime? birthDate = null, DateTime? deathDate = null, IEnumerable<string>? genres = null)
+        public static Author Create(string name, string? bio = null, string? nationality = null, DateOnly? birthDate = null, DateOnly? deathDate = null, IEnumerable<string>? genres = null)
         {
             if (string.IsNullOrWhiteSpace(name)) throw new DomainException("Name is required");
             if (birthDate.HasValue && deathDate.HasValue && deathDate < birthDate) throw new DomainException("DeathDate cannot be before BirthDate");
@@ -61,13 +59,13 @@ namespace Domain.Models
             Nationality = (nationality ?? string.Empty).Trim();
         }
 
-        public void SetBirthDate(DateTime? birthDate)
+        public void SetBirthDate(DateOnly? birthDate)
         {
             BirthDate = birthDate;
             if (BirthDate.HasValue && DeathDate.HasValue && DeathDate < BirthDate) throw new DomainException("DeathDate cannot be before BirthDate");
         }
 
-        public void SetDeathDate(DateTime? deathDate)
+        public void SetDeathDate(DateOnly? deathDate)
         {
             DeathDate = deathDate;
             if (BirthDate.HasValue && DeathDate.HasValue && DeathDate < BirthDate) throw new DomainException("DeathDate cannot be before BirthDate");
