@@ -19,8 +19,13 @@ namespace FilterBooks
         {
             await _validator.ValidateAndThrowAsync(input, ct);
 
-            var filter = input.ToBookFilter();
-            var books = await _bookRepository.FilterAsync(filter.ToExpression(), ct);
+            var genre = string.IsNullOrWhiteSpace(input.Genre) ? null : input.Genre;
+            var filter = new BookFilter
+            {
+                Genre = genre
+            };
+
+            var books = await _bookRepository.FilterAsync(filter, ct);
 
             return books.Select(book => new FilterBooksQueryOutput
             {
