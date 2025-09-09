@@ -1,13 +1,11 @@
 using FluentValidation;
 
-namespace GetBookById
+namespace GetAuthorById
 {
-    public class GetBookByIdQueryValidator : AbstractValidator<GetBookByIdQueryInput>
+    public class GetAuthorByIdQueryValidator : AbstractValidator<GetAuthorByIdQueryInput>
     {
-        public GetBookByIdQueryValidator()
+        public GetAuthorByIdQueryValidator()
         {
-            RuleFor(x => x.Id)
-                .NotEmpty().WithMessage("Id is required");
             RuleFor(x => x.Id)
                 .NotEmpty().WithMessage("Id is required")
                 .Matches("^[{(]?[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}[)}]?$")
