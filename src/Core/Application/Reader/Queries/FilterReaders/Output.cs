@@ -1,10 +1,11 @@
-namespace CreateReader
+namespace FilterReaders
 {
-    public class CreateReaderCommandInput
+    public class FilterReadersQueryOutput
     {
+        public string Id { get; set; } = string.Empty;
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
-        public DateOnly? MembershipDate { get; set; }
+        public DateOnly MembershipDate { get; set; }
     }
 }

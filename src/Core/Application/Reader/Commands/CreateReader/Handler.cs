@@ -21,9 +21,10 @@ namespace CreateReader
 
             var reader = new Reader
             {
-                FullName = input.FullName,
+                FirstName = input.FirstName,
+                LastName = input.LastName,
                 Email = input.Email,
-                MembershipDate = input.MembershipDate ?? System.DateTime.UtcNow
+                MembershipDate = input.MembershipDate ?? DateOnly.FromDateTime(DateTime.UtcNow)
             };
 
             var created = await _readerRepository.CreateAsync(reader, ct);
@@ -31,7 +32,8 @@ namespace CreateReader
             return new CreateReaderCommandOutput
             {
                 Id = created.Id,
-                FullName = created.FullName,
+                FirstName = created.FirstName,
+                LastName = created.LastName,
                 Email = created.Email,
                 MembershipDate = created.MembershipDate
             };

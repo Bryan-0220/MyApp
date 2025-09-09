@@ -25,14 +25,14 @@ namespace UpdateAuthor
                 .When(x => !string.IsNullOrWhiteSpace(x.Nationality) && x.Nationality != "string");
 
             RuleFor(x => x.BirthDate)
-                .Must(d => !d.HasValue || d.Value != default(DateTime)).WithMessage("BirthDate is not valid")
+                .Must(d => !d.HasValue || d.Value != default(DateOnly)).WithMessage("BirthDate is not valid")
                 .When(x => x.BirthDate.HasValue)
                 .LessThanOrEqualTo(x => x.DeathDate ?? x.BirthDate)
                 .When(x => x.BirthDate.HasValue && x.DeathDate.HasValue)
                 .WithMessage("BirthDate must be before or equal to DeathDate");
 
             RuleFor(x => x.DeathDate)
-                .Must(d => !d.HasValue || d.Value != default(DateTime)).WithMessage("DeathDate is not valid")
+                .Must(d => !d.HasValue || d.Value != default(DateOnly)).WithMessage("DeathDate is not valid")
                 .When(x => x.DeathDate.HasValue);
 
             RuleForEach(x => x.Genres)

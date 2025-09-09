@@ -11,9 +11,13 @@ namespace CreateReader
         {
             _readerRepository = readerRepository;
 
-            RuleFor(x => x.FullName)
-                .NotEmpty().WithMessage("FullName is required")
-                .MaximumLength(200).WithMessage("FullName must be at most 200 characters");
+            RuleFor(x => x.FirstName)
+                .NotEmpty().WithMessage("FirstName is required")
+                .MaximumLength(100).WithMessage("FirstName must be at most 100 characters");
+
+            RuleFor(x => x.LastName)
+                .NotEmpty().WithMessage("LastName is required")
+                .MaximumLength(100).WithMessage("LastName must be at most 100 characters");
 
             RuleFor(x => x.Email)
                 .NotEmpty().WithMessage("Email is required")
