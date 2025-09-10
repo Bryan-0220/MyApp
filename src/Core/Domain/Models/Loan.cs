@@ -9,12 +9,12 @@ namespace Domain.Models
 
     public class Loan
     {
-        public string Id { get; set; } = System.Guid.NewGuid().ToString();
+        public string Id { get; set; } = Guid.NewGuid().ToString();
         public string BookId { get; set; } = string.Empty;
-        public string UserId { get; set; } = string.Empty;
-        // public System.DateOnly LoanDate { get; set; } = System.DateOnly.UtcNow;
-        // public System.DateOnly DueDate { get; set; } = System.DateOnly.UtcNow.AddDays(14);
-        public System.DateOnly? ReturnedDate { get; set; }
+        public string ReaderId { get; set; } = string.Empty;
+        public DateOnly LoanDate { get; set; } = DateOnly.FromDateTime(DateTime.UtcNow);
+        public DateOnly DueDate { get; set; } = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(14);
+        public DateOnly? ReturnedDate { get; set; }
         public LoanStatus Status { get; set; } = LoanStatus.Active;
     }
 }
