@@ -10,6 +10,12 @@ using UpdateBook;
 using GetAllBooks;
 using GetBookById;
 using FilterBooks;
+using CreateLoan;
+using DeleteLoan;
+using UpdateLoan;
+using GetLoanById;
+using GetAllLoans;
+using FilterLoans;
 using CreateAuthor;
 using DeleteAuthor;
 using UpdateAuthor;
@@ -43,6 +49,20 @@ builder.Services.AddScoped<IBookRepository, BookRepository>();
 builder.Services.AddScoped<IAuthorRepository, AuthorRepository>();
 
 builder.Services.AddScoped<IReaderRepository, ReaderRepository>();
+
+builder.Services.AddScoped<ILoanRepository, LoanRepository>();
+
+builder.Services.AddScoped<ICreateLoanCommandHandler, CreateLoanCommandHandler>();
+builder.Services.AddScoped<IGetLoanByIdQueryHandler, GetLoanByIdQueryHandler>();
+builder.Services.AddScoped<IGetAllLoansQueryHandler, GetAllLoansQueryHandler>();
+builder.Services.AddScoped<IDeleteLoanCommandHandler, DeleteLoanCommandHandler>();
+builder.Services.AddScoped<IUpdateLoanCommandHandler, UpdateLoanCommandHandler>();
+builder.Services.AddScoped<IFilterLoansQueryHandler, FilterLoansQueryHandler>();
+builder.Services.AddScoped<IValidator<CreateLoanCommandInput>, CreateLoanCommandValidator>();
+builder.Services.AddScoped<IValidator<DeleteLoanCommandInput>, DeleteLoanCommandValidator>();
+builder.Services.AddScoped<IValidator<UpdateLoanCommandInput>, UpdateLoanCommandValidator>();
+builder.Services.AddScoped<IValidator<GetLoanByIdQueryInput>, GetLoanByIdQueryValidator>();
+builder.Services.AddScoped<IValidator<FilterLoansQueryInput>, FilterLoansQueryValidator>();
 
 builder.Services.AddScoped<ICreateReaderCommandHandler, CreateReaderCommandHandler>();
 builder.Services.AddScoped<IGetReaderByIdQueryHandler, GetReaderByIdQueryHandler>();
