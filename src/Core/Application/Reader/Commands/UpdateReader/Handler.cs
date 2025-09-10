@@ -26,7 +26,7 @@ namespace UpdateReader
             {
                 applyAttributes(input, existing);
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 throw new InvalidOperationException(ex.Message);
             }

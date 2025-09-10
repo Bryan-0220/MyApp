@@ -48,7 +48,7 @@ namespace Infrastructure.Repositories
                     f = f & builder.Eq(a => a.Id, filter.Id);
                 if (filter.BirthYear.HasValue)
                     f = f & builder.Eq(a => a.BirthDate.HasValue ? a.BirthDate.Value.Year : -1, filter.BirthYear.Value);
-                if (filter.Genres != null && System.Linq.Enumerable.Any(filter.Genres))
+                if (filter.Genres != null && Enumerable.Any(filter.Genres))
                     f = f & builder.All(a => a.Genres, filter.Genres);
             }
 

@@ -42,7 +42,7 @@ namespace UpdateAuthor
                 Nationality = string.IsNullOrWhiteSpace(existing.Nationality) ? null : existing.Nationality,
                 BirthDate = existing.BirthDate,
                 DeathDate = existing.DeathDate,
-                Genres = existing.Genres == null ? System.Array.Empty<string>() : System.Linq.Enumerable.ToArray(existing.Genres)
+                Genres = existing.Genres == null ? Array.Empty<string>() : Enumerable.ToArray(existing.Genres)
             };
         }
 

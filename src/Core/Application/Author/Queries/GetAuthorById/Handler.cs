@@ -24,7 +24,7 @@ namespace GetAuthorById
                 Nationality = string.IsNullOrWhiteSpace(author.Nationality) ? null : author.Nationality,
                 BirthDate = author.BirthDate,
                 DeathDate = author.DeathDate,
-                Genres = author.Genres == null ? System.Array.Empty<string>() : System.Linq.Enumerable.ToArray(author.Genres)
+                Genres = author.Genres == null ? Array.Empty<string>() : Enumerable.ToArray(author.Genres)
             };
         }
     }

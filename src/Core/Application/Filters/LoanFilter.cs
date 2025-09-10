@@ -5,7 +5,8 @@ namespace Application.Filters
         public string? UserId { get; set; }
         public string? BookId { get; set; }
         public bool? Returned { get; set; }
-        public System.DateOnly? FromDate { get; set; }
-        public System.DateOnly? ToDate { get; set; }
+        public DateOnly? LoanDate { get; set; }
+        public DateOnly? DueDate { get; set; }
+        public DateOnly? ReturnedDate { get; set; }
     }
 }

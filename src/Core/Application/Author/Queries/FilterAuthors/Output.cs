@@ -8,6 +8,6 @@ namespace FilterAuthors
         public string? Nationality { get; set; }
         public DateOnly? BirthDate { get; set; }
         public DateOnly? DeathDate { get; set; }
-        public IEnumerable<string> Genres { get; set; } = System.Array.Empty<string>();
+        public IEnumerable<string> Genres { get; set; } = Array.Empty<string>();
     }
 }

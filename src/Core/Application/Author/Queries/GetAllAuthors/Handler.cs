@@ -23,7 +23,7 @@ namespace GetAllAuthors
                 Nationality = string.IsNullOrWhiteSpace(a.Nationality) ? null : a.Nationality,
                 BirthDate = a.BirthDate,
                 DeathDate = a.DeathDate,
-                Genres = a.Genres == null ? System.Array.Empty<string>() : System.Linq.Enumerable.ToArray(a.Genres)
+                Genres = a.Genres == null ? Array.Empty<string>() : Enumerable.ToArray(a.Genres)
             });
 
             return projected;

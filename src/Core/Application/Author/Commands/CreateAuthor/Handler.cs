@@ -40,7 +40,7 @@ namespace CreateAuthor
                 Nationality = string.IsNullOrWhiteSpace(created.Nationality) ? null : created.Nationality,
                 BirthDate = created.BirthDate,
                 DeathDate = created.DeathDate,
-                Genres = (created.Genres == null) ? System.Array.Empty<string>() : System.Linq.Enumerable.ToArray(created.Genres)
+                Genres = (created.Genres == null) ? Array.Empty<string>() : Enumerable.ToArray(created.Genres)
             };
         }
     }
