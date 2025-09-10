@@ -86,9 +86,9 @@ namespace Infrastructure.Repositories
             return await GetAllAsync(ct);
         }
 
-        public async Task<bool> TryChangeCopiesAsync(string bookId, int delta, CancellationToken ct = default)
+        public async Task<bool> TryChangeCopiesAsync(string bookId, int numberOfCopiesAfected, CancellationToken ct = default)
         {
-            var update = Builders<Book>.Update.Inc(b => b.CopiesAvailable, delta);
+            var update = Builders<Book>.Update.Inc(b => b.CopiesAvailable, numberOfCopiesAfected);
             var options = new FindOneAndUpdateOptions<Book>
             {
                 ReturnDocument = ReturnDocument.After
@@ -96,7 +96,7 @@ namespace Infrastructure.Repositories
 
             var filter = Builders<Book>.Filter.And(
                 Builders<Book>.Filter.Eq(b => b.Id, bookId),
-                Builders<Book>.Filter.Gte(b => b.CopiesAvailable, Math.Max(0, -delta))
+                Builders<Book>.Filter.Gte(b => b.CopiesAvailable, Math.Max(0, -numberOfCopiesAfected))
             );
 
             var updated = await _books.FindOneAndUpdateAsync(filter, update, options, ct);
