@@ -110,17 +110,17 @@
       "Filosofía"
     ]
   }
-    {
-      "name": "Octavio Paz",
-      "bio": "Poeta, ensayista y diplomático mexicano, ganador del Premio Nobel de Literatura en 1990.",
-      "nationality": "Mexicana",
-      "birthDate": "1914-03-31",
-      "deathDate": "1998-04-19",
-      "genres": [
-        "Poesía",
-        "Ensayo"
-      ]
-    }
+  {
+    "name": "Octavio Paz",
+    "bio": "Poeta, ensayista y diplomático mexicano, ganador del Premio Nobel de Literatura en 1990.",
+    "nationality": "Mexicana",
+    "birthDate": "1914-03-31",
+    "deathDate": "1998-04-19",
+    "genres": [
+      "Poesía",
+      "Ensayo"
+    ]
+  }
 
 # Loan
   {
@@ -135,7 +135,7 @@
     "loanDate": "2025-09-10",
     "dueDate": "2025-09-24"
   }
-      {
+  {
     "bookId": "f3d45a5c-f7ae-4f1b-8680-9a4e6e8de62b",
     "readerId": "7ceb210f-94bf-4806-a079-acf011aec9fb",
     "loanDate": "2025-09-10",
