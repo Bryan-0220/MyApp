@@ -34,21 +34,9 @@ namespace Infrastructure.Repositories
 
             if (filter != null)
             {
-                if (!string.IsNullOrWhiteSpace(filter.Title))
-                    f = f & builder.Regex(b => b.Title, new MongoDB.Bson.BsonRegularExpression(filter.Title, "i"));
-                if (!string.IsNullOrWhiteSpace(filter.AuthorId))
-                    f = f & builder.Eq(b => b.AuthorId, filter.AuthorId);
-                if (!string.IsNullOrWhiteSpace(filter.Isbn))
-                    f = f & builder.Eq(b => b.ISBN, filter.Isbn);
-                if (filter.PublishedYear.HasValue)
-                    f = f & builder.Eq(b => b.PublishedYear, filter.PublishedYear.Value);
-
-                if (filter.Available.HasValue)
+                if (!string.IsNullOrWhiteSpace(filter.Genre))
                 {
-                    if (filter.Available.Value)
-                        f = f & builder.Gt(b => b.CopiesAvailable, 0);
-                    else
-                        f = f & builder.Lte(b => b.CopiesAvailable, 0);
+                    f = f & builder.Regex(b => b.Genre, new MongoDB.Bson.BsonRegularExpression(filter.Genre, "i"));
                 }
             }
 
