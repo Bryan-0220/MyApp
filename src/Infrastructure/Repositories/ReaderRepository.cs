@@ -28,15 +28,6 @@ namespace Infrastructure.Repositories
             return res.DeletedCount > 0;
         }
 
-        public async Task<IEnumerable<Reader>> FilterAsync(Expression<Func<Reader, bool>>? predicate = null, CancellationToken ct = default)
-        {
-            if (predicate == null)
-                return await (await _readers.FindAsync(Builders<Reader>.Filter.Empty, cancellationToken: ct)).ToListAsync(ct);
-
-            var cursor = await _readers.FindAsync(predicate, cancellationToken: ct);
-            return await cursor.ToListAsync(ct);
-        }
-
         public async Task<IEnumerable<Reader>> FilterAsync(ReaderFilter? filter = null, CancellationToken ct = default)
         {
             var builder = Builders<Reader>.Filter;

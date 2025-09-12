@@ -44,13 +44,6 @@ namespace Infrastructure.Repositories
             return await cursor.ToListAsync(ct);
         }
 
-        public async Task<IEnumerable<Book>> FilterAsync(Expression<Func<Book, bool>>? predicate = null, CancellationToken ct = default)
-        {
-            if (predicate == null) return await (await _books.FindAsync(Builders<Book>.Filter.Empty, cancellationToken: ct)).ToListAsync(ct);
-            var cursor = await _books.FindAsync(predicate, cancellationToken: ct);
-            return await cursor.ToListAsync(ct);
-        }
-
         public async Task<IEnumerable<Book>> GetAllAsync(CancellationToken ct = default)
         {
             var cursor = await _books.FindAsync(Builders<Book>.Filter.Empty, cancellationToken: ct);
