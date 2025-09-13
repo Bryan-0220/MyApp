@@ -6,6 +6,9 @@ namespace CreateLoan
     {
         public CreateLoanCommandValidator()
         {
+            RuleFor(x => x)
+                .NotNull().WithMessage("Request input cannot be null");
+
             RuleFor(x => x.BookId)
                 .NotEmpty().WithMessage("BookId is required");
 
