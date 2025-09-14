@@ -54,6 +54,7 @@ builder.Services.AddScoped<ILoanRepository, LoanRepository>();
 
 builder.Services.AddScoped<Application.Books.Services.IBookDeletionService, Application.Books.Services.BookDeletionService>();
 builder.Services.AddScoped<Application.Readers.Services.IReaderDeletionService, Application.Readers.Services.ReaderDeletionService>();
+builder.Services.AddScoped<Application.Authors.Services.IAuthorDeletionService, Application.Authors.Services.AuthorDeletionService>();
 
 builder.Services.AddScoped<ICreateLoanCommandHandler, CreateLoanCommandHandler>();
 builder.Services.AddScoped<IGetLoanByIdQueryHandler, GetLoanByIdQueryHandler>();
