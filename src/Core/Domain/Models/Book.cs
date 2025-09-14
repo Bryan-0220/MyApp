@@ -78,6 +78,11 @@ namespace Domain.Models
             CopiesAvailable = copies;
         }
 
+        public void EnsureHasAvailableCopies()
+        {
+            if (CopiesAvailable < 1) throw new DomainException("No copies available for this book");
+        }
+
         public void SetGenre(string genre)
         {
             if (string.IsNullOrWhiteSpace(genre)) throw new DomainException("Genre is required");

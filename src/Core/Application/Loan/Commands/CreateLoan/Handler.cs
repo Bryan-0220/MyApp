@@ -1,7 +1,6 @@
 using Domain.Models;
 using Domain.Common;
 using Application.Interfaces;
-using Application.ServicesLoan;
 using FluentValidation;
 
 namespace CreateLoan
@@ -17,20 +16,18 @@ namespace CreateLoan
         private readonly IBookRepository _bookRepository;
         private readonly IReaderRepository _readerRepository;
         private readonly IValidator<CreateLoanCommandInput> _validator;
-        private readonly LoanService _loanService;
 
         public CreateLoanCommandHandler(
             ILoanRepository loanRepository,
             IBookRepository bookRepository,
             IReaderRepository readerRepository,
-            IValidator<CreateLoanCommandInput> validator,
-            LoanService loanService)
+            IValidator<CreateLoanCommandInput> validator)
         {
             _loanRepository = loanRepository ?? throw new ArgumentNullException(nameof(loanRepository));
             _bookRepository = bookRepository ?? throw new ArgumentNullException(nameof(bookRepository));
             _readerRepository = readerRepository ?? throw new ArgumentNullException(nameof(readerRepository));
             _validator = validator ?? throw new ArgumentNullException(nameof(validator));
-            _loanService = loanService ?? throw new ArgumentNullException(nameof(loanService));
+            // LoanService business validation moved to domain entity Book.EnsureHasAvailableCopies()
         }
 
         public async Task<CreateLoanCommandOutput> HandleAsync(CreateLoanCommandInput input, CancellationToken ct = default)
@@ -40,7 +37,8 @@ namespace CreateLoan
             var book = await EnsureBookExistsAsync(input.BookId, ct);
             var reader = await EnsureReaderExistsAsync(input.ReaderId, ct);
 
-            _loanService.EnsureBookHasAvailableCopies(book);
+            // Validate via domain entity
+            book.EnsureHasAvailableCopies();
 
             var changed = await _bookRepository.TryChangeCopiesAsync(input.BookId, -1, ct);
             if (!changed) throw new DomainException(NoCopiesMessage);
