@@ -1,6 +1,7 @@
 # Git ignore para proyecto .NET / Visual Studio / Rider
 # Basado en la plantilla oficial de GitHub para VisualStudio / .NET
 
+.github/
 ## Build output
 bin/
 obj/
