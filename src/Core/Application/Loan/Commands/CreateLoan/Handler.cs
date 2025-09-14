@@ -13,35 +13,32 @@ namespace CreateLoan
         private const int DefaultLoanDays = 14;
 
         private readonly ILoanRepository _loanRepository;
-        private readonly IBookRepository _bookRepository;
-        private readonly IReaderRepository _readerRepository;
+        private readonly Application.Books.Services.IBookService _bookService;
+        private readonly Application.Readers.Services.IReaderService _readerService;
         private readonly IValidator<CreateLoanCommandInput> _validator;
 
         public CreateLoanCommandHandler(
             ILoanRepository loanRepository,
-            IBookRepository bookRepository,
-            IReaderRepository readerRepository,
+            Application.Books.Services.IBookService bookService,
+            Application.Readers.Services.IReaderService readerService,
             IValidator<CreateLoanCommandInput> validator)
         {
             _loanRepository = loanRepository ?? throw new ArgumentNullException(nameof(loanRepository));
-            _bookRepository = bookRepository ?? throw new ArgumentNullException(nameof(bookRepository));
-            _readerRepository = readerRepository ?? throw new ArgumentNullException(nameof(readerRepository));
+            _bookService = bookService ?? throw new ArgumentNullException(nameof(bookService));
+            _readerService = readerService ?? throw new ArgumentNullException(nameof(readerService));
             _validator = validator ?? throw new ArgumentNullException(nameof(validator));
-            // LoanService business validation moved to domain entity Book.EnsureHasAvailableCopies()
         }
 
         public async Task<CreateLoanCommandOutput> HandleAsync(CreateLoanCommandInput input, CancellationToken ct = default)
         {
             await _validator.ValidateAndThrowAsync(input, ct);
 
-            var book = await EnsureBookExistsAsync(input.BookId, ct);
-            var reader = await EnsureReaderExistsAsync(input.ReaderId, ct);
+            var book = await _bookService.EnsureExistsAsync(input.BookId, ct);
+            var reader = await _readerService.EnsureExistsAsync(input.ReaderId, ct);
 
-            // Validate via domain entity
             book.EnsureHasAvailableCopies();
 
-            var changed = await _bookRepository.TryChangeCopiesAsync(input.BookId, -1, ct);
-            if (!changed) throw new DomainException(NoCopiesMessage);
+            await _bookService.DecreaseCopiesOrThrowAsync(input.BookId, ct);
 
             var now = DateOnly.FromDateTime(DateTime.UtcNow);
 
@@ -53,23 +50,24 @@ namespace CreateLoan
                 DueDate = input.DueDate ?? now.AddDays(DefaultLoanDays)
             };
 
-            var created = await _loanRepository.CreateAsync(loan, ct);
+            try
+            {
+                var created = await _loanRepository.CreateAsync(loan, ct);
+                return MapToOutput(created);
+            }
+            catch (Exception)
+            {
+                try
+                {
+                    await _bookService.RestoreCopiesAsync(input.BookId, ct);
+                }
+                catch (Exception)
+                {
+                    throw new DomainException("Failed to create loan and failed to restore book copies.");
+                }
 
-            return MapToOutput(created);
-        }
-
-        private async Task<Book> EnsureBookExistsAsync(string bookId, CancellationToken ct)
-        {
-            var book = await _bookRepository.GetByIdAsync(bookId, ct);
-            if (book == null) throw new DomainException(BookNotFoundMessage);
-            return book;
-        }
-
-        private async Task<Domain.Models.Reader> EnsureReaderExistsAsync(string readerId, CancellationToken ct)
-        {
-            var reader = await _readerRepository.GetByIdAsync(readerId, ct);
-            if (reader == null) throw new DomainException(ReaderNotFoundMessage);
-            return reader;
+                throw;
+            }
         }
 
         private CreateLoanCommandOutput MapToOutput(Loan created)

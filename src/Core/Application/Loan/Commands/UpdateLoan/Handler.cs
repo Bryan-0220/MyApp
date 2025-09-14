@@ -29,7 +29,6 @@ namespace UpdateLoan
             }
             catch (DomainException ex)
             {
-                // Preserve the domain exception as inner exception to keep stack and details
                 throw new InvalidOperationException(ex.Message, ex);
             }
 

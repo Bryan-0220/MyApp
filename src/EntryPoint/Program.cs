@@ -104,6 +104,10 @@ builder.Services.AddScoped<IValidator<UpdateBookCommandInput>, UpdateBookCommand
 builder.Services.AddScoped<IValidator<GetBookByIdQueryInput>, GetBookByIdQueryValidator>();
 builder.Services.AddScoped<IValidator<FilterBooksQueryInput>, FilterBooksQueryValidator>();
 
+// Domain services
+builder.Services.AddScoped<Application.Books.Services.IBookService, Application.Books.Services.BookService>();
+builder.Services.AddScoped<Application.Readers.Services.IReaderService, Application.Readers.Services.ReaderService>();
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
