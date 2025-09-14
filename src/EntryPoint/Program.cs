@@ -53,6 +53,7 @@ builder.Services.AddScoped<IReaderRepository, ReaderRepository>();
 builder.Services.AddScoped<ILoanRepository, LoanRepository>();
 
 builder.Services.AddScoped<Application.Books.Services.IBookDeletionService, Application.Books.Services.BookDeletionService>();
+builder.Services.AddScoped<Application.Readers.Services.IReaderDeletionService, Application.Readers.Services.ReaderDeletionService>();
 
 builder.Services.AddScoped<ICreateLoanCommandHandler, CreateLoanCommandHandler>();
 builder.Services.AddScoped<IGetLoanByIdQueryHandler, GetLoanByIdQueryHandler>();
