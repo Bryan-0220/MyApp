@@ -1,6 +1,7 @@
 using Application.Interfaces;
 using Domain.Models;
 using FluentValidation;
+using Application.Readers.Mappers;
 
 namespace UpdateReader
 {
@@ -33,14 +34,7 @@ namespace UpdateReader
 
             await _readerRepository.UpdateAsync(existing, ct);
 
-            return new UpdateReaderCommandOutput
-            {
-                Id = existing.Id,
-                FirstName = existing.FirstName,
-                LastName = existing.LastName,
-                Email = existing.Email,
-                MembershipDate = existing.MembershipDate
-            };
+            return existing.ToUpdateReaderOutput();
         }
 
         private static void applyAttributes(UpdateReaderCommandInput input, Reader existing)

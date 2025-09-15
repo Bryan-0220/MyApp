@@ -1,4 +1,5 @@
 using Application.Interfaces;
+using Application.Readers.Mappers;
 
 namespace GetAllReaders
 {
@@ -15,14 +16,7 @@ namespace GetAllReaders
         {
             var users = await _readerRepository.GetAllAsync(ct);
 
-            var projected = users.Select(r => new GetAllReadersQueryOutput
-            {
-                Id = r.Id,
-                FirstName = r.FirstName,
-                LastName = r.LastName,
-                Email = r.Email,
-                MembershipDate = r.MembershipDate
-            });
+            var projected = users.Select(r => r.ToGetAllReadersOutput());
 
             return projected;
         }

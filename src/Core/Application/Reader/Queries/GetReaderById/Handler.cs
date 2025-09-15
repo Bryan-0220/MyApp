@@ -1,4 +1,5 @@
 using Application.Interfaces;
+using Application.Readers.Mappers;
 
 namespace GetReaderById
 {
@@ -16,14 +17,7 @@ namespace GetReaderById
             var user = await _readerRepository.GetByIdAsync(query.Id, ct);
             if (user is null) return null;
 
-            return new GetReaderByIdQueryOutput
-            {
-                Id = user.Id,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Email = user.Email,
-                MembershipDate = user.MembershipDate
-            };
+            return user.ToGetReaderByIdOutput();
         }
     }
 }

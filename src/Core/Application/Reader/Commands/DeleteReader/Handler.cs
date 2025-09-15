@@ -1,6 +1,7 @@
 using Application.Interfaces;
 using FluentValidation;
 using Application.Readers.Services;
+using Application.Readers.Mappers;
 
 namespace DeleteReader
 {
@@ -24,21 +25,13 @@ namespace DeleteReader
             var existing = await _readerRepository.GetByIdAsync(input.Id, ct);
             if (existing is null)
             {
-                return new DeleteReaderCommandOutput
-                {
-                    Success = false,
-                    Message = "Reader not found"
-                };
+                return (null as Domain.Models.Reader).ToDeleteReaderOutput(false, "Reader not found");
             }
 
             await _readerService.EnsureCanDelete(existing.Id, ct);
 
             await _readerRepository.DeleteAsync(input.Id, ct);
-            return new DeleteReaderCommandOutput
-            {
-                Success = true,
-                Message = "Reader deleted"
-            };
+            return existing.ToDeleteReaderOutput(true, "Reader deleted");
         }
     }
 }

@@ -1,6 +1,7 @@
 using Domain.Models;
 using Application.Interfaces;
 using FluentValidation;
+using Application.Readers.Mappers;
 
 namespace CreateReader
 {
@@ -29,14 +30,7 @@ namespace CreateReader
 
             var created = await _readerRepository.CreateAsync(reader, ct);
 
-            return new CreateReaderCommandOutput
-            {
-                Id = created.Id,
-                FirstName = created.FirstName,
-                LastName = created.LastName,
-                Email = created.Email,
-                MembershipDate = created.MembershipDate
-            };
+            return created.ToCreateReaderOutput();
         }
     }
 }
