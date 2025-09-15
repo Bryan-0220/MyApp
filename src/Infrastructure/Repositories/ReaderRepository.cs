@@ -69,22 +69,17 @@ namespace Infrastructure.Repositories
             return await GetAll(ct);
         }
 
-        public async Task<bool> Update(string id, Reader entity, CancellationToken ct = default)
+        public async Task<bool> Update(Reader reader, CancellationToken ct = default)
         {
             try
             {
-                var res = await _readers.ReplaceOneAsync(r => r.Id == id, entity, cancellationToken: ct);
+                var res = await _readers.ReplaceOneAsync(r => r.Id == reader.Id, reader, cancellationToken: ct);
                 return res.ModifiedCount > 0 || res.MatchedCount > 0;
             }
             catch (MongoWriteException ex) when (ex.WriteError?.Category == ServerErrorCategory.DuplicateKey)
             {
                 throw new InvalidOperationException("Duplicate key in readers collection.");
             }
-        }
-
-        public async Task Update(Reader entity, CancellationToken ct = default)
-        {
-            await Update(entity.Id, entity, ct);
         }
     }
 }

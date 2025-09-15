@@ -84,11 +84,11 @@ namespace Infrastructure.Repositories
             return updated != null;
         }
 
-        public async Task<bool> Update(string id, Book entity, CancellationToken ct = default)
+        public async Task<bool> Update(Book book, CancellationToken ct = default)
         {
             try
             {
-                var res = await _books.ReplaceOneAsync(b => b.Id == id, entity, cancellationToken: ct);
+                var res = await _books.ReplaceOneAsync(b => b.Id == book.Id, book, cancellationToken: ct);
                 return res.ModifiedCount > 0 || res.MatchedCount > 0;
             }
             catch (MongoWriteException ex) when (ex.WriteError?.Category == ServerErrorCategory.DuplicateKey)
@@ -97,9 +97,5 @@ namespace Infrastructure.Repositories
             }
         }
 
-        public async Task Update(Book entity, CancellationToken ct = default)
-        {
-            await Update(entity.Id, entity, ct);
-        }
     }
 }

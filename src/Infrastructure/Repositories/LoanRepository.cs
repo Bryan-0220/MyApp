@@ -80,16 +80,12 @@ namespace Infrastructure.Repositories
             return await GetAll(ct);
         }
 
-        public async Task<bool> Update(string id, Loan entity, CancellationToken ct = default)
+        public async Task<bool> Update(Loan loan, CancellationToken ct = default)
         {
-            var res = await _loans.ReplaceOneAsync(b => b.Id == id, entity, cancellationToken: ct);
+            var res = await _loans.ReplaceOneAsync(b => b.Id == loan.Id, loan, cancellationToken: ct);
             return res.ModifiedCount > 0 || res.MatchedCount > 0;
         }
 
-        public async Task Update(Loan entity, CancellationToken ct = default)
-        {
-            await Update(entity.Id, entity, ct);
-        }
 
         public async Task MarkReturned(string loanId, DateOnly returnedDate, CancellationToken ct = default)
         {
