@@ -10,6 +10,21 @@ namespace Application.Authors.Mappers
 {
     public static class AuthorMapper
     {
+        public static AuthorData ToData(this CreateAuthorCommandInput input)
+        {
+            if (input == null) return null!;
+
+            return new AuthorData
+            {
+                Name = input.Name?.Trim() ?? string.Empty,
+                Bio = string.IsNullOrWhiteSpace(input.Bio) ? null : input.Bio.Trim(),
+                Nationality = string.IsNullOrWhiteSpace(input.Nationality) ? null : input.Nationality.Trim(),
+                BirthDate = input.BirthDate,
+                DeathDate = input.DeathDate,
+                Genres = input.Genres?.Where(g => !string.IsNullOrWhiteSpace(g)).Select(g => g.Trim()).ToArray() ?? Array.Empty<string>()
+            };
+        }
+
         public static CreateAuthorCommandOutput ToOutput(this Author author)
         {
             return new CreateAuthorCommandOutput

@@ -17,23 +17,24 @@ namespace Domain.Models
 
         public Author() { }
 
-        public static Author Create(string name, string? bio = null, string? nationality = null, DateOnly? birthDate = null, DateOnly? deathDate = null, IEnumerable<string>? genres = null)
+        public static Author Create(AuthorData input)
         {
-            if (string.IsNullOrWhiteSpace(name)) throw new DomainException("Name is required");
-            if (birthDate.HasValue && deathDate.HasValue && deathDate < birthDate) throw new DomainException("DeathDate cannot be before BirthDate");
+            if (input == null) throw new DomainException("Input is required");
+            if (string.IsNullOrWhiteSpace(input.Name)) throw new DomainException("Name is required");
+            if (input.BirthDate.HasValue && input.DeathDate.HasValue && input.DeathDate < input.BirthDate) throw new DomainException("DeathDate cannot be before BirthDate");
 
             var a = new Author
             {
-                Name = name.Trim(),
-                Bio = string.IsNullOrWhiteSpace(bio) ? null : bio.Trim(),
-                Nationality = (nationality ?? string.Empty).Trim(),
-                BirthDate = birthDate,
-                DeathDate = deathDate
+                Name = input.Name.Trim(),
+                Bio = string.IsNullOrWhiteSpace(input.Bio) ? null : input.Bio.Trim(),
+                Nationality = (input.Nationality ?? string.Empty).Trim(),
+                BirthDate = input.BirthDate,
+                DeathDate = input.DeathDate
             };
 
-            if (genres != null)
+            if (input.Genres != null)
             {
-                foreach (var g in genres)
+                foreach (var g in input.Genres)
                 {
                     if (string.IsNullOrWhiteSpace(g)) continue;
                     a.Genres.Add(g.Trim());

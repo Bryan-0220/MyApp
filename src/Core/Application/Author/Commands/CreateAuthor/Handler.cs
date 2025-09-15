@@ -28,7 +28,7 @@ namespace CreateAuthor
             {
                 await _authorService.EnsureCanCreateAsync(input.Name, ct);
 
-                author = Author.Create(input.Name, input.Bio, input.Nationality, input.BirthDate, input.DeathDate, input.Genres);
+                author = Author.Create(input.ToData());
             }
             catch (DomainException ex)
             {
