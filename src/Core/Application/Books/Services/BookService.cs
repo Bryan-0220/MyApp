@@ -6,10 +6,12 @@ namespace Application.Books.Services
     public class BookService : IBookService
     {
         private readonly IBookRepository _bookRepository;
+        private readonly ILoanRepository _loanRepository;
 
-        public BookService(IBookRepository bookRepository)
+        public BookService(IBookRepository bookRepository, ILoanRepository loanRepository)
         {
             _bookRepository = bookRepository;
+            _loanRepository = loanRepository;
         }
 
         public async Task<Domain.Models.Book> EnsureExistsAsync(string bookId, CancellationToken ct = default)
@@ -30,5 +32,6 @@ namespace Application.Books.Services
             var changed = await _bookRepository.TryChangeCopiesAsync(bookId, +1, ct);
             if (!changed) throw new DomainException("Failed to restore book copies after loan creation failure.");
         }
+
     }
 }
