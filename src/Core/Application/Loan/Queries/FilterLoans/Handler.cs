@@ -16,7 +16,7 @@ namespace FilterLoans
             _validator = validator;
         }
 
-        public async Task<IEnumerable<FilterLoansQueryOutput>> HandleAsync(FilterLoansQueryInput input, CancellationToken ct = default)
+        public async Task<IEnumerable<FilterLoansQueryOutput>> Handle(FilterLoansQueryInput input, CancellationToken ct = default)
         {
             await _validator.ValidateAndThrowAsync(input, ct);
 
@@ -31,7 +31,7 @@ namespace FilterLoans
                 Returned = string.IsNullOrWhiteSpace(input.Status) ? null : (input.Status == "Returned" ? true : input.Status == "Active" ? false : (bool?)null)
             };
 
-            var loans = await _loanRepository.FilterAsync(filter, ct);
+            var loans = await _loanRepository.Filter(filter, ct);
 
             return loans.Select(loan => loan.ToFilterLoansOutput());
         }

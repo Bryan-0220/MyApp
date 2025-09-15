@@ -2,6 +2,6 @@ namespace DeleteReader
 {
     public interface IDeleteReaderCommandHandler
     {
-        Task<DeleteReaderCommandOutput> HandleAsync(DeleteReaderCommandInput input, CancellationToken ct = default);
+        Task<DeleteReaderCommandOutput> Handle(DeleteReaderCommandInput input, CancellationToken ct = default);
     }
 }

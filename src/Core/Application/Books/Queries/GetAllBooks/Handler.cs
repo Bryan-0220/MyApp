@@ -12,9 +12,9 @@ namespace GetAllBooks
             _bookRepository = bookRepository;
         }
 
-        public async Task<IEnumerable<GetAllBooksQueryOutput>> HandleAsync(GetAllBooksQueryInput query, CancellationToken ct = default)
+        public async Task<IEnumerable<GetAllBooksQueryOutput>> Handle(GetAllBooksQueryInput query, CancellationToken ct = default)
         {
-            var books = await _bookRepository.GetAllAsync(ct);
+            var books = await _bookRepository.GetAll(ct);
 
             return books.Select(b => b.ToGetAllBooksOutput());
         }

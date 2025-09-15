@@ -17,20 +17,20 @@ namespace Application.Books.Services
 
         public async Task<Book> EnsureExists(string bookId, CancellationToken ct = default)
         {
-            var book = await _bookRepository.GetByIdAsync(bookId, ct);
+            var book = await _bookRepository.GetById(bookId, ct);
             if (book == null) throw new DomainException("Book not found.");
             return book;
         }
 
         public async Task DecreaseCopiesOrThrow(string bookId, CancellationToken ct = default)
         {
-            var changed = await _bookRepository.TryChangeCopiesAsync(bookId, -1, ct);
+            var changed = await _bookRepository.TryChangeCopies(bookId, -1, ct);
             if (!changed) throw new DomainException("No copies available for the requested book.");
         }
 
         public async Task RestoreCopies(string bookId, CancellationToken ct = default)
         {
-            var changed = await _bookRepository.TryChangeCopiesAsync(bookId, +1, ct);
+            var changed = await _bookRepository.TryChangeCopies(bookId, +1, ct);
             if (!changed) throw new DomainException("Failed to restore book copies after loan creation failure.");
         }
 
@@ -46,7 +46,7 @@ namespace Application.Books.Services
                 Returned = false
             };
 
-            var loans = await _loanRepository.FilterAsync(filter, ct);
+            var loans = await _loanRepository.Filter(filter, ct);
             if (loans != null && loans.Any())
             {
                 throw new DomainException("Book cannot be deleted while it has active loans.");

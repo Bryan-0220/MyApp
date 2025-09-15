@@ -16,7 +16,7 @@ namespace FilterAuthors
             _validator = validator;
         }
 
-        public async Task<IEnumerable<FilterAuthorsQueryOutput>> HandleAsync(FilterAuthorsQueryInput input, CancellationToken ct = default)
+        public async Task<IEnumerable<FilterAuthorsQueryOutput>> Handle(FilterAuthorsQueryInput input, CancellationToken ct = default)
         {
             await _validator.ValidateAndThrowAsync(input, ct);
 
@@ -28,7 +28,7 @@ namespace FilterAuthors
                 Genres = cleanedGenres != null && cleanedGenres.Length > 0 ? cleanedGenres : null
             };
 
-            var authors = await _authorRepository.FilterAsync(filter, ct);
+            var authors = await _authorRepository.Filter(filter, ct);
 
             return authors.Select(a => a.ToFilterAuthorsOutput());
         }

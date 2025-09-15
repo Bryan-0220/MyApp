@@ -18,11 +18,11 @@ namespace DeleteReader
             _validator = validator;
         }
 
-        public async Task<DeleteReaderCommandOutput> HandleAsync(DeleteReaderCommandInput input, CancellationToken ct = default)
+        public async Task<DeleteReaderCommandOutput> Handle(DeleteReaderCommandInput input, CancellationToken ct = default)
         {
             await _validator.ValidateAndThrowAsync(input, ct);
 
-            var existing = await _readerRepository.GetByIdAsync(input.Id, ct);
+            var existing = await _readerRepository.GetById(input.Id, ct);
             if (existing is null)
             {
                 return (null as Domain.Models.Reader).ToDeleteReaderOutput(false, "Reader not found");
@@ -30,7 +30,7 @@ namespace DeleteReader
 
             await _readerService.EnsureCanDelete(existing.Id, ct);
 
-            await _readerRepository.DeleteAsync(input.Id, ct);
+            await _readerRepository.Delete(input.Id, ct);
             return existing.ToDeleteReaderOutput(true, "Reader deleted");
         }
     }

@@ -5,7 +5,7 @@ namespace Application.Interfaces
 {
     public interface IBookRepository : IRepository<Book>
     {
-        Task<IEnumerable<Book>> FilterAsync(BookFilter? filter = null, CancellationToken ct = default);
-        Task<bool> TryChangeCopiesAsync(string bookId, int delta, CancellationToken ct = default);
+        Task<IEnumerable<Book>> Filter(BookFilter? filter = null, CancellationToken ct = default);
+        Task<bool> TryChangeCopies(string bookId, int delta, CancellationToken ct = default);
     }
 }

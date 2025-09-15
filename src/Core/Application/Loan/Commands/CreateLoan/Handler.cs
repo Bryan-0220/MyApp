@@ -35,7 +35,7 @@ namespace CreateLoan
         }
 
 
-        public async Task<CreateLoanCommandOutput> HandleAsync(CreateLoanCommandInput input, CancellationToken ct = default)
+        public async Task<CreateLoanCommandOutput> Handle(CreateLoanCommandInput input, CancellationToken ct = default)
         {
             await _validator.ValidateAndThrowAsync(input, ct);
 
@@ -44,7 +44,7 @@ namespace CreateLoan
 
             book.EnsureHasAvailableCopies();
 
-            await _loanService.EnsureNoDuplicateLoanAsync(input.BookId, input.ReaderId, ct);
+            await _loanService.EnsureNoDuplicateLoan(input.BookId, input.ReaderId, ct);
 
             await _bookService.DecreaseCopiesOrThrow(input.BookId, ct);
 
@@ -60,7 +60,7 @@ namespace CreateLoan
 
             try
             {
-                var created = await _loanRepository.CreateAsync(loan, ct);
+                var created = await _loanRepository.Create(loan, ct);
                 return created.ToCreateLoanOutput();
             }
             catch (Exception)

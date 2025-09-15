@@ -2,6 +2,6 @@ namespace UpdateReader
 {
     public interface IUpdateReaderCommandHandler
     {
-        Task<UpdateReaderCommandOutput?> HandleAsync(UpdateReaderCommandInput input, CancellationToken ct = default);
+        Task<UpdateReaderCommandOutput?> Handle(UpdateReaderCommandInput input, CancellationToken ct = default);
     }
 }

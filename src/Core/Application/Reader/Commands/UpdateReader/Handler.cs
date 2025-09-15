@@ -16,11 +16,11 @@ namespace UpdateReader
             _validator = validator;
         }
 
-        public async Task<UpdateReaderCommandOutput?> HandleAsync(UpdateReaderCommandInput input, CancellationToken ct = default)
+        public async Task<UpdateReaderCommandOutput?> Handle(UpdateReaderCommandInput input, CancellationToken ct = default)
         {
             await _validator.ValidateAndThrowAsync(input, ct);
 
-            var existing = await _readerRepository.GetByIdAsync(input.Id, ct);
+            var existing = await _readerRepository.GetById(input.Id, ct);
             if (existing is null) return null;
 
             try
@@ -32,7 +32,7 @@ namespace UpdateReader
                 throw new InvalidOperationException(ex.Message);
             }
 
-            await _readerRepository.UpdateAsync(existing, ct);
+            await _readerRepository.Update(existing, ct);
 
             return existing.ToUpdateReaderOutput();
         }

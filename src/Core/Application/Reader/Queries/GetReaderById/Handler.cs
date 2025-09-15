@@ -12,9 +12,9 @@ namespace GetReaderById
             _readerRepository = readerRepository;
         }
 
-        public async Task<GetReaderByIdQueryOutput?> HandleAsync(GetReaderByIdQueryInput query, CancellationToken ct = default)
+        public async Task<GetReaderByIdQueryOutput?> Handle(GetReaderByIdQueryInput query, CancellationToken ct = default)
         {
-            var user = await _readerRepository.GetByIdAsync(query.Id, ct);
+            var user = await _readerRepository.GetById(query.Id, ct);
             if (user is null) return null;
 
             return user.ToGetReaderByIdOutput();

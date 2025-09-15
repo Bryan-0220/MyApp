@@ -25,31 +25,31 @@ namespace DeleteLoan
             _loanService = loanService ?? throw new ArgumentNullException(nameof(loanService));
         }
 
-        public async Task<DeleteLoanCommandOutput> HandleAsync(DeleteLoanCommandInput input, CancellationToken ct = default)
+        public async Task<DeleteLoanCommandOutput> Handle(DeleteLoanCommandInput input, CancellationToken ct = default)
         {
             await _validator.ValidateAndThrowAsync(input, ct);
 
-            var existing = await _loanRepository.GetByIdAsync(input.Id, ct);
+            var existing = await _loanRepository.GetById(input.Id, ct);
             if (existing is null)
             {
                 return (null as Domain.Models.Loan).ToDeleteLoanOutput(false, LoanNotFoundMessage);
             }
 
-            if (!await _loanService.EnsureCanDeleteAsync(existing, ct))
+            if (!await _loanService.EnsureCanDelete(existing, ct))
             {
                 return existing.ToDeleteLoanOutput(false, CannotDeleteActiveMessage);
             }
 
             try
             {
-                await _loanService.HandlePostDeleteAsync(existing, ct);
+                await _loanService.HandlePostDelete(existing, ct);
             }
             catch (Exception ex)
             {
                 return existing.ToDeleteLoanOutput(false, ex.Message);
             }
 
-            await _loanRepository.DeleteAsync(input.Id, ct);
+            await _loanRepository.Delete(input.Id, ct);
             return existing.ToDeleteLoanOutput(true, LoanDeletedMessage);
         }
 

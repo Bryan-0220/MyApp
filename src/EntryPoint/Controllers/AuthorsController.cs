@@ -38,7 +38,7 @@ namespace EntryPoint.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateAuthorCommandInput input)
         {
-            var result = await _createAuthorHandler.HandleAsync(input, HttpContext.RequestAborted);
+            var result = await _createAuthorHandler.Handle(input, HttpContext.RequestAborted);
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
 
@@ -46,7 +46,7 @@ namespace EntryPoint.Controllers
         public async Task<IActionResult> Update(string id, [FromBody] UpdateAuthorCommandInput input)
         {
             input.Id = id;
-            var updated = await _updateAuthorHandler.HandleAsync(input, HttpContext.RequestAborted);
+            var updated = await _updateAuthorHandler.Handle(input, HttpContext.RequestAborted);
             if (updated is null) return NotFound();
             return Ok(updated);
         }
@@ -54,7 +54,7 @@ namespace EntryPoint.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)
         {
-            var result = await _deleteAuthorHandler.HandleAsync(new DeleteAuthorCommandInput { Id = id }, HttpContext.RequestAborted);
+            var result = await _deleteAuthorHandler.Handle(new DeleteAuthorCommandInput { Id = id }, HttpContext.RequestAborted);
             if (!result.Success) return NotFound();
             return NoContent();
         }
@@ -62,7 +62,7 @@ namespace EntryPoint.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var authors = await _getAllAuthorsQueryHandler.HandleAsync(new GetAllAuthorsQueryInput(), HttpContext.RequestAborted);
+            var authors = await _getAllAuthorsQueryHandler.Handle(new GetAllAuthorsQueryInput(), HttpContext.RequestAborted);
             return Ok(authors);
         }
 
@@ -70,14 +70,14 @@ namespace EntryPoint.Controllers
         public async Task<IActionResult> Filter([FromQuery] string[]? genres, [FromQuery] string? name, [FromQuery] string? nationality)
         {
             var input = new FilterAuthorsQueryInput { Genres = genres, Name = name, Nationality = nationality };
-            var authors = await _filterAuthorsQueryHandler.HandleAsync(input, HttpContext.RequestAborted);
+            var authors = await _filterAuthorsQueryHandler.Handle(input, HttpContext.RequestAborted);
             return Ok(authors);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(string id)
         {
-            var author = await _getAuthorByIdQueryHandler.HandleAsync(new GetAuthorByIdQueryInput { Id = id }, HttpContext.RequestAborted);
+            var author = await _getAuthorByIdQueryHandler.Handle(new GetAuthorByIdQueryInput { Id = id }, HttpContext.RequestAborted);
             if (author == null) return NotFound();
             return Ok(author);
         }

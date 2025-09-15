@@ -15,19 +15,19 @@ namespace Infrastructure.Repositories
             _books = database.GetCollection<Book>("books");
         }
 
-        public async Task<Book> CreateAsync(Book entity, CancellationToken ct = default)
+        public async Task<Book> Create(Book entity, CancellationToken ct = default)
         {
             await _books.InsertOneAsync(entity, cancellationToken: ct);
             return entity;
         }
 
-        public async Task<bool> DeleteAsync(string id, CancellationToken ct = default)
+        public async Task<bool> Delete(string id, CancellationToken ct = default)
         {
             var res = await _books.DeleteOneAsync(b => b.Id == id, ct);
             return res.DeletedCount > 0;
         }
 
-        public async Task<IEnumerable<Book>> FilterAsync(BookFilter? filter = null, CancellationToken ct = default)
+        public async Task<IEnumerable<Book>> Filter(BookFilter? filter = null, CancellationToken ct = default)
         {
             var builder = Builders<Book>.Filter;
             var f = builder.Empty;
@@ -44,30 +44,30 @@ namespace Infrastructure.Repositories
             return await cursor.ToListAsync(ct);
         }
 
-        public async Task<IEnumerable<Book>> GetAllAsync(CancellationToken ct = default)
+        public async Task<IEnumerable<Book>> GetAll(CancellationToken ct = default)
         {
             var cursor = await _books.FindAsync(Builders<Book>.Filter.Empty, cancellationToken: ct);
             return await cursor.ToListAsync(ct);
         }
 
-        public async Task<Book?> GetByIdAsync(string id, CancellationToken ct = default)
+        public async Task<Book?> GetById(string id, CancellationToken ct = default)
         {
             var cursor = await _books.FindAsync(b => b.Id == id, cancellationToken: ct);
             return await cursor.FirstOrDefaultAsync(ct);
         }
 
-        public async Task<long> CountAsync(Expression<Func<Book, bool>>? predicate = null, CancellationToken ct = default)
+        public async Task<long> Count(Expression<Func<Book, bool>>? predicate = null, CancellationToken ct = default)
         {
             if (predicate == null) return await _books.CountDocumentsAsync(Builders<Book>.Filter.Empty, cancellationToken: ct);
             return await _books.CountDocumentsAsync(Builders<Book>.Filter.Where(predicate), cancellationToken: ct);
         }
 
-        public async Task<IEnumerable<Book>> ListAsync(CancellationToken ct = default)
+        public async Task<IEnumerable<Book>> List(CancellationToken ct = default)
         {
-            return await GetAllAsync(ct);
+            return await GetAll(ct);
         }
 
-        public async Task<bool> TryChangeCopiesAsync(string bookId, int numberOfCopiesAfected, CancellationToken ct = default)
+        public async Task<bool> TryChangeCopies(string bookId, int numberOfCopiesAfected, CancellationToken ct = default)
         {
             var update = Builders<Book>.Update.Inc(b => b.CopiesAvailable, numberOfCopiesAfected);
             var options = new FindOneAndUpdateOptions<Book>
@@ -84,7 +84,7 @@ namespace Infrastructure.Repositories
             return updated != null;
         }
 
-        public async Task<bool> UpdateAsync(string id, Book entity, CancellationToken ct = default)
+        public async Task<bool> Update(string id, Book entity, CancellationToken ct = default)
         {
             try
             {
@@ -97,9 +97,9 @@ namespace Infrastructure.Repositories
             }
         }
 
-        public async Task UpdateAsync(Book entity, CancellationToken ct = default)
+        public async Task Update(Book entity, CancellationToken ct = default)
         {
-            await UpdateAsync(entity.Id, entity, ct);
+            await Update(entity.Id, entity, ct);
         }
     }
 }

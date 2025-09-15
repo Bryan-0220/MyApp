@@ -19,14 +19,14 @@ namespace CreateAuthor
             _authorService = authorService;
         }
 
-        public async Task<CreateAuthorCommandOutput> HandleAsync(CreateAuthorCommandInput input, CancellationToken ct = default)
+        public async Task<CreateAuthorCommandOutput> Handle(CreateAuthorCommandInput input, CancellationToken ct = default)
         {
             await _validator.ValidateAndThrowAsync(input, ct);
 
             Author author;
             try
             {
-                await _authorService.EnsureCanCreateAsync(input.Name, ct);
+                await _authorService.EnsureCanCreate(input.Name, ct);
 
                 author = Author.Create(input.ToData());
             }
@@ -35,7 +35,7 @@ namespace CreateAuthor
                 throw new InvalidOperationException(ex.Message);
             }
 
-            var created = await _authorRepository.CreateAsync(author, ct);
+            var created = await _authorRepository.Create(author, ct);
 
             return created.ToOutput();
         }

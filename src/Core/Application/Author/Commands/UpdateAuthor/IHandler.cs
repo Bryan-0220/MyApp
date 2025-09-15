@@ -2,6 +2,6 @@ namespace UpdateAuthor
 {
     public interface IUpdateAuthorCommandHandler
     {
-        Task<UpdateAuthorCommandOutput?> HandleAsync(UpdateAuthorCommandInput input, CancellationToken ct = default);
+        Task<UpdateAuthorCommandOutput?> Handle(UpdateAuthorCommandInput input, CancellationToken ct = default);
     }
 }

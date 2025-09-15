@@ -19,11 +19,11 @@ namespace DeleteAuthor
             _validator = validator;
         }
 
-        public async Task<DeleteAuthorCommandOutput> HandleAsync(DeleteAuthorCommandInput input, CancellationToken ct = default)
+        public async Task<DeleteAuthorCommandOutput> Handle(DeleteAuthorCommandInput input, CancellationToken ct = default)
         {
             await _validator.ValidateAndThrowAsync(input, ct);
 
-            var existing = await _authorRepository.GetByIdAsync(input.Id, ct);
+            var existing = await _authorRepository.GetById(input.Id, ct);
             if (existing is null)
             {
                 return (null as Domain.Models.Author).ToDeleteOutput(false, "Author not found");
@@ -31,14 +31,14 @@ namespace DeleteAuthor
 
             try
             {
-                await _deletionService.EnsureCanDeleteAsync(input.Id, ct);
+                await _deletionService.EnsureCanDelete(input.Id, ct);
             }
             catch (DomainException dex)
             {
                 return existing.ToDeleteOutput(false, dex.Message);
             }
 
-            await _authorRepository.DeleteAsync(input.Id, ct);
+            await _authorRepository.Delete(input.Id, ct);
             return existing.ToDeleteOutput(true, "Author deleted");
         }
     }

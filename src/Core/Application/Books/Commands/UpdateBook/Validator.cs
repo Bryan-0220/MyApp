@@ -31,7 +31,7 @@ namespace UpdateBook
                 .MustAsync(async (input, isbn, ct) =>
                 {
                     if (string.IsNullOrWhiteSpace(isbn) || isbn == "string") return true;
-                    var count = await _bookRepository.CountAsync(b => b.ISBN == isbn && b.Id != input.Id, ct);
+                    var count = await _bookRepository.Count(b => b.ISBN == isbn && b.Id != input.Id, ct);
                     return count == 0;
                 })
                 .WithMessage("Ya existe un libro con ese ISBN.");

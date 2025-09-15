@@ -38,7 +38,7 @@ namespace EntryPoint.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateBookCommandInput input)
         {
-            var result = await _createBookHandler.HandleAsync(input, HttpContext.RequestAborted);
+            var result = await _createBookHandler.Handle(input, HttpContext.RequestAborted);
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
 
@@ -46,7 +46,7 @@ namespace EntryPoint.Controllers
         public async Task<IActionResult> Update(string id, [FromBody] UpdateBookCommandInput input)
         {
             input.Id = id;
-            var updated = await _updateBookHandler.HandleAsync(input, HttpContext.RequestAborted);
+            var updated = await _updateBookHandler.Handle(input, HttpContext.RequestAborted);
             if (updated is null) return NotFound();
             return Ok(updated);
         }
@@ -54,7 +54,7 @@ namespace EntryPoint.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)
         {
-            var result = await _deleteBookHandler.HandleAsync(new DeleteBookCommandInput { Id = id }, HttpContext.RequestAborted);
+            var result = await _deleteBookHandler.Handle(new DeleteBookCommandInput { Id = id }, HttpContext.RequestAborted);
             if (!result.Success) return NotFound();
             return NoContent();
         }
@@ -62,21 +62,21 @@ namespace EntryPoint.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var books = await _getAllBooksQueryHandler.HandleAsync(new GetAllBooksQueryInput(), HttpContext.RequestAborted);
+            var books = await _getAllBooksQueryHandler.Handle(new GetAllBooksQueryInput(), HttpContext.RequestAborted);
             return Ok(books);
         }
 
         [HttpGet("filter")]
         public async Task<IActionResult> Filter([FromQuery] string? genre)
         {
-            var books = await _filterBooksQueryHandler.HandleAsync(new FilterBooksQueryInput { Genre = genre }, HttpContext.RequestAborted);
+            var books = await _filterBooksQueryHandler.Handle(new FilterBooksQueryInput { Genre = genre }, HttpContext.RequestAborted);
             return Ok(books);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(string id)
         {
-            var book = await _getBookByIdQueryHandler.HandleAsync(new GetBookByIdQueryInput { Id = id }, HttpContext.RequestAborted);
+            var book = await _getBookByIdQueryHandler.Handle(new GetBookByIdQueryInput { Id = id }, HttpContext.RequestAborted);
             if (book == null) return NotFound();
             return Ok(book);
         }

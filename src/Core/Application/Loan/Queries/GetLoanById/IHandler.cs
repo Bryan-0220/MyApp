@@ -2,6 +2,6 @@ namespace GetLoanById
 {
     public interface IGetLoanByIdQueryHandler
     {
-        Task<GetLoanByIdQueryOutput?> HandleAsync(GetLoanByIdQueryInput query, CancellationToken ct);
+        Task<GetLoanByIdQueryOutput?> Handle(GetLoanByIdQueryInput query, CancellationToken ct);
     }
 }

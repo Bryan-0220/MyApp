@@ -16,7 +16,7 @@ namespace FilterReaders
             _validator = validator;
         }
 
-        public async Task<IEnumerable<FilterReadersQueryOutput>> HandleAsync(FilterReadersQueryInput input, CancellationToken ct = default)
+        public async Task<IEnumerable<FilterReadersQueryOutput>> Handle(FilterReadersQueryInput input, CancellationToken ct = default)
         {
             await _validator.ValidateAndThrowAsync(input, ct);
 
@@ -26,7 +26,7 @@ namespace FilterReaders
                 LastName = input.LastName
             };
 
-            var readers = await _readerRepository.FilterAsync(rf, ct);
+            var readers = await _readerRepository.Filter(rf, ct);
 
             return readers.Select(r => r.ToFilterReadersOutput());
         }

@@ -12,9 +12,9 @@ namespace GetAllLoans
             _loanRepository = loanRepository;
         }
 
-        public async Task<IEnumerable<GetAllLoansQueryOutput>> HandleAsync(GetAllLoansQueryInput query, CancellationToken ct = default)
+        public async Task<IEnumerable<GetAllLoansQueryOutput>> Handle(GetAllLoansQueryInput query, CancellationToken ct = default)
         {
-            var loans = await _loanRepository.GetAllAsync(ct);
+            var loans = await _loanRepository.GetAll(ct);
 
             return loans.Select(b => b.ToGetAllLoansOutput());
         }

@@ -4,8 +4,8 @@ namespace Application.Loans.Services
 {
     public interface ILoanService
     {
-        Task EnsureNoDuplicateLoanAsync(string bookId, string readerId, CancellationToken ct = default);
-        Task<bool> EnsureCanDeleteAsync(Loan loan, CancellationToken ct = default);
-        Task HandlePostDeleteAsync(Loan loan, CancellationToken ct = default);
+        Task EnsureNoDuplicateLoan(string bookId, string readerId, CancellationToken ct = default);
+        Task<bool> EnsureCanDelete(Loan loan, CancellationToken ct = default);
+        Task HandlePostDelete(Loan loan, CancellationToken ct = default);
     }
 }

@@ -12,9 +12,9 @@ namespace GetLoanById
             _loanRepository = loanRepository;
         }
 
-        public async Task<GetLoanByIdQueryOutput?> HandleAsync(GetLoanByIdQueryInput query, CancellationToken ct = default)
+        public async Task<GetLoanByIdQueryOutput?> Handle(GetLoanByIdQueryInput query, CancellationToken ct = default)
         {
-            var loan = await _loanRepository.GetByIdAsync(query.Id, ct);
+            var loan = await _loanRepository.GetById(query.Id, ct);
             if (loan is null) return null;
 
             return loan.ToGetLoanByIdOutput();

@@ -17,11 +17,11 @@ namespace UpdateLoan
             _validator = validator ?? throw new ArgumentNullException(nameof(validator));
         }
 
-        public async Task<UpdateLoanCommandOutput?> HandleAsync(UpdateLoanCommandInput input, CancellationToken ct = default)
+        public async Task<UpdateLoanCommandOutput?> Handle(UpdateLoanCommandInput input, CancellationToken ct = default)
         {
             await _validator.ValidateAndThrowAsync(input, ct);
 
-            var existing = await _loanRepository.GetByIdAsync(input.Id, ct);
+            var existing = await _loanRepository.GetById(input.Id, ct);
             if (existing is null) return null;
 
             try
@@ -33,7 +33,7 @@ namespace UpdateLoan
                 throw new InvalidOperationException(ex.Message, ex);
             }
 
-            await _loanRepository.UpdateAsync(existing, ct);
+            await _loanRepository.Update(existing, ct);
 
             return existing.ToUpdateLoanOutput();
         }

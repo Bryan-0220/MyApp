@@ -2,6 +2,6 @@ namespace FilterAuthors
 {
     public interface IFilterAuthorsQueryHandler
     {
-        Task<IEnumerable<FilterAuthorsQueryOutput>> HandleAsync(FilterAuthorsQueryInput input, CancellationToken ct = default);
+        Task<IEnumerable<FilterAuthorsQueryOutput>> Handle(FilterAuthorsQueryInput input, CancellationToken ct = default);
     }
 }

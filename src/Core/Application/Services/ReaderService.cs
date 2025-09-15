@@ -18,7 +18,7 @@ namespace Application.Readers.Services
 
         public async Task<Reader> EnsureExists(string readerId, CancellationToken ct = default)
         {
-            var reader = await _readerRepository.GetByIdAsync(readerId, ct);
+            var reader = await _readerRepository.GetById(readerId, ct);
             if (reader == null) throw new DomainException("Reader not found.");
             return reader;
         }
@@ -34,7 +34,7 @@ namespace Application.Readers.Services
                 Returned = false
             };
 
-            var loans = await _loanRepository.FilterAsync(filter, ct);
+            var loans = await _loanRepository.Filter(filter, ct);
             if (loans != null && loans.Any())
             {
                 throw new DomainException("Reader cannot be deleted while has active loans.");

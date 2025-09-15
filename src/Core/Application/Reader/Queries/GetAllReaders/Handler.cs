@@ -12,9 +12,9 @@ namespace GetAllReaders
             _readerRepository = readerRepository;
         }
 
-        public async Task<IEnumerable<GetAllReadersQueryOutput>> HandleAsync(GetAllReadersQueryInput query, CancellationToken ct = default)
+        public async Task<IEnumerable<GetAllReadersQueryOutput>> Handle(GetAllReadersQueryInput query, CancellationToken ct = default)
         {
-            var users = await _readerRepository.GetAllAsync(ct);
+            var users = await _readerRepository.GetAll(ct);
 
             var projected = users.Select(r => r.ToGetAllReadersOutput());
 

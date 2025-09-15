@@ -38,7 +38,7 @@ namespace EntryPoint.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateLoanCommandInput input)
         {
-            var result = await _createLoanHandler.HandleAsync(input, HttpContext.RequestAborted);
+            var result = await _createLoanHandler.Handle(input, HttpContext.RequestAborted);
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
 
@@ -46,7 +46,7 @@ namespace EntryPoint.Controllers
         public async Task<IActionResult> Update(string id, [FromBody] UpdateLoanCommandInput input)
         {
             input.Id = id;
-            var updated = await _updateLoanHandler.HandleAsync(input, HttpContext.RequestAborted);
+            var updated = await _updateLoanHandler.Handle(input, HttpContext.RequestAborted);
             if (updated is null) return NotFound();
             return Ok(updated);
         }
@@ -54,7 +54,7 @@ namespace EntryPoint.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)
         {
-            var result = await _deleteLoanHandler.HandleAsync(new DeleteLoanCommandInput { Id = id }, HttpContext.RequestAborted);
+            var result = await _deleteLoanHandler.Handle(new DeleteLoanCommandInput { Id = id }, HttpContext.RequestAborted);
             if (!result.Deleted) return NotFound();
             return NoContent();
         }
@@ -62,7 +62,7 @@ namespace EntryPoint.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var loans = await _getAllLoansQueryHandler.HandleAsync(new GetAllLoansQueryInput(), HttpContext.RequestAborted);
+            var loans = await _getAllLoansQueryHandler.Handle(new GetAllLoansQueryInput(), HttpContext.RequestAborted);
             return Ok(loans);
         }
 
@@ -70,14 +70,14 @@ namespace EntryPoint.Controllers
         public async Task<IActionResult> Filter([FromQuery] string? bookId, [FromQuery] string? readerId, [FromQuery] string? status)
         {
             var input = new FilterLoansQueryInput { BookId = bookId, ReaderId = readerId, Status = status };
-            var loans = await _filterLoansQueryHandler.HandleAsync(input, HttpContext.RequestAborted);
+            var loans = await _filterLoansQueryHandler.Handle(input, HttpContext.RequestAborted);
             return Ok(loans);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(string id)
         {
-            var loan = await _getLoanByIdQueryHandler.HandleAsync(new GetLoanByIdQueryInput { Id = id }, HttpContext.RequestAborted);
+            var loan = await _getLoanByIdQueryHandler.Handle(new GetLoanByIdQueryInput { Id = id }, HttpContext.RequestAborted);
             if (loan == null) return NotFound();
             return Ok(loan);
         }

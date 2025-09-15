@@ -16,19 +16,19 @@ namespace Infrastructure.Repositories
             _authors = database.GetCollection<Author>("authors");
         }
 
-        public async Task<Author> CreateAsync(Author entity, CancellationToken ct = default)
+        public async Task<Author> Create(Author entity, CancellationToken ct = default)
         {
             await _authors.InsertOneAsync(entity, cancellationToken: ct);
             return entity;
         }
 
-        public async Task<bool> DeleteAsync(string id, CancellationToken ct = default)
+        public async Task<bool> Delete(string id, CancellationToken ct = default)
         {
             var res = await _authors.DeleteOneAsync(a => a.Id == id, ct);
             return res.DeletedCount > 0;
         }
 
-        public async Task<IEnumerable<Author>> FilterAsync(AuthorFilter? filter = null, CancellationToken ct = default)
+        public async Task<IEnumerable<Author>> Filter(AuthorFilter? filter = null, CancellationToken ct = default)
         {
             var builder = Builders<Author>.Filter;
             var f = builder.Empty;
@@ -49,30 +49,30 @@ namespace Infrastructure.Repositories
             return await cursor.ToListAsync(ct);
         }
 
-        public async Task<IEnumerable<Author>> GetAllAsync(CancellationToken ct = default)
+        public async Task<IEnumerable<Author>> GetAll(CancellationToken ct = default)
         {
             var cursor = await _authors.FindAsync(Builders<Author>.Filter.Empty, cancellationToken: ct);
             return await cursor.ToListAsync(ct);
         }
 
-        public async Task<Author?> GetByIdAsync(string id, CancellationToken ct = default)
+        public async Task<Author?> GetById(string id, CancellationToken ct = default)
         {
             var cursor = await _authors.FindAsync(a => a.Id == id, cancellationToken: ct);
             return await cursor.FirstOrDefaultAsync(ct);
         }
 
-        public async Task<long> CountAsync(Expression<Func<Author, bool>>? predicate = null, CancellationToken ct = default)
+        public async Task<long> Count(Expression<Func<Author, bool>>? predicate = null, CancellationToken ct = default)
         {
             if (predicate == null) return await _authors.CountDocumentsAsync(Builders<Author>.Filter.Empty, cancellationToken: ct);
             return await _authors.CountDocumentsAsync(Builders<Author>.Filter.Where(predicate), cancellationToken: ct);
         }
 
-        public async Task<IEnumerable<Author>> ListAsync(CancellationToken ct = default)
+        public async Task<IEnumerable<Author>> List(CancellationToken ct = default)
         {
-            return await GetAllAsync(ct);
+            return await GetAll(ct);
         }
 
-        public async Task<bool> UpdateAsync(string id, Author entity, CancellationToken ct = default)
+        public async Task<bool> Update(string id, Author entity, CancellationToken ct = default)
         {
             try
             {
@@ -85,9 +85,9 @@ namespace Infrastructure.Repositories
             }
         }
 
-        public async Task UpdateAsync(Author entity, CancellationToken ct = default)
+        public async Task Update(Author entity, CancellationToken ct = default)
         {
-            await UpdateAsync(entity.Id, entity, ct);
+            await Update(entity.Id, entity, ct);
         }
     }
 }

@@ -12,9 +12,9 @@ namespace GetAllAuthors
             _authorRepository = authorRepository;
         }
 
-        public async Task<IEnumerable<GetAllAuthorsQueryOutput>> HandleAsync(GetAllAuthorsQueryInput query, CancellationToken ct = default)
+        public async Task<IEnumerable<GetAllAuthorsQueryOutput>> Handle(GetAllAuthorsQueryInput query, CancellationToken ct = default)
         {
-            var authors = await _authorRepository.GetAllAsync(ct);
+            var authors = await _authorRepository.GetAll(ct);
 
             var projected = authors.Select(a => a.ToGetAllAuthorsOutput());
 

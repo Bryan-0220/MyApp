@@ -17,7 +17,7 @@ namespace CreateBook
             _validator = validator;
         }
 
-        public async Task<CreateBookCommandOutput> HandleAsync(CreateBookCommandInput input, CancellationToken ct = default)
+        public async Task<CreateBookCommandOutput> Handle(CreateBookCommandInput input, CancellationToken ct = default)
         {
             await _validator.ValidateAndThrowAsync(input, ct);
 
@@ -31,7 +31,7 @@ namespace CreateBook
                 throw new InvalidOperationException(ex.Message);
             }
 
-            var created = await _bookRepository.CreateAsync(book, ct);
+            var created = await _bookRepository.Create(book, ct);
 
             return created.ToCreateBookOutput();
         }

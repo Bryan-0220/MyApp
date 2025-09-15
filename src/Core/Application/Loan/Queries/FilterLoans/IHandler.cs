@@ -2,6 +2,6 @@ namespace FilterLoans
 {
     public interface IFilterLoansQueryHandler
     {
-        Task<IEnumerable<FilterLoansQueryOutput>> HandleAsync(FilterLoansQueryInput input, CancellationToken ct = default);
+        Task<IEnumerable<FilterLoansQueryOutput>> Handle(FilterLoansQueryInput input, CancellationToken ct = default);
     }
 }

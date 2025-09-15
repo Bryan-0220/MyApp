@@ -12,9 +12,9 @@ namespace GetAuthorById
             _authorRepository = authorRepository;
         }
 
-        public async Task<GetAuthorByIdQueryOutput?> HandleAsync(GetAuthorByIdQueryInput query, CancellationToken ct = default)
+        public async Task<GetAuthorByIdQueryOutput?> Handle(GetAuthorByIdQueryInput query, CancellationToken ct = default)
         {
-            var author = await _authorRepository.GetByIdAsync(query.Id, ct);
+            var author = await _authorRepository.GetById(query.Id, ct);
             if (author is null) return null;
 
             return author.ToGetAuthorByIdOutput();

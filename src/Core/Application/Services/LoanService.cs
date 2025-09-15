@@ -17,7 +17,7 @@ namespace Application.Loans.Services
             _bookService = bookService;
         }
 
-        public async Task EnsureNoDuplicateLoanAsync(string bookId, string readerId, CancellationToken ct = default)
+        public async Task EnsureNoDuplicateLoan(string bookId, string readerId, CancellationToken ct = default)
         {
             var filter = new LoanFilter
             {
@@ -26,7 +26,7 @@ namespace Application.Loans.Services
                 Returned = false
             };
 
-            var loans = await _loanRepository.FilterAsync(filter, ct);
+            var loans = await _loanRepository.Filter(filter, ct);
             if (loans != null && loans.Any())
             {
                 throw new DomainException("Reader already has this book on loan.");
@@ -36,7 +36,7 @@ namespace Application.Loans.Services
 
 
 
-        public Task<bool> EnsureCanDeleteAsync(Loan loan, CancellationToken ct = default)
+        public Task<bool> EnsureCanDelete(Loan loan, CancellationToken ct = default)
         {
             if (loan is null) throw new DomainException("Loan is null");
 
@@ -48,7 +48,7 @@ namespace Application.Loans.Services
             return Task.FromResult(true);
         }
 
-        public async Task HandlePostDeleteAsync(Loan loan, CancellationToken ct = default)
+        public async Task HandlePostDelete(Loan loan, CancellationToken ct = default)
         {
             if (loan is null) throw new DomainException("Loan is null");
 

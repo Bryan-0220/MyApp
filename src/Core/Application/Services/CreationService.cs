@@ -16,7 +16,7 @@ namespace Application.Authors.Services
             _bookRepository = bookRepository;
         }
 
-        public async Task EnsureCanCreateAsync(string name, CancellationToken ct = default)
+        public async Task EnsureCanCreate(string name, CancellationToken ct = default)
         {
             if (string.IsNullOrWhiteSpace(name)) throw new DomainException("Name is required");
 
@@ -25,20 +25,20 @@ namespace Application.Authors.Services
                 Name = name.Trim()
             };
 
-            var existing = await _authorRepository.FilterAsync(filter, ct);
+            var existing = await _authorRepository.Filter(filter, ct);
             if (existing != null && existing.Any())
             {
                 throw new DomainException("An author with the same name already exists.");
             }
         }
-        public async Task EnsureCanDeleteAsync(string authorId, CancellationToken ct = default)
+        public async Task EnsureCanDelete(string authorId, CancellationToken ct = default)
         {
             var filter = new BookFilter
             {
                 AuthorId = authorId
             };
 
-            var books = await _bookRepository.FilterAsync(filter, ct);
+            var books = await _bookRepository.Filter(filter, ct);
             if (books != null && books.Any())
             {
                 throw new DomainException("Author cannot be deleted while they have registered books.");

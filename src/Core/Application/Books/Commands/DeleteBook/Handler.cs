@@ -19,11 +19,11 @@ namespace DeleteBook
             _bookService = bookService;
         }
 
-        public async Task<DeleteBookCommandOutput> HandleAsync(DeleteBookCommandInput input, CancellationToken ct = default)
+        public async Task<DeleteBookCommandOutput> Handle(DeleteBookCommandInput input, CancellationToken ct = default)
         {
             await _validator.ValidateAndThrowAsync(input, ct);
 
-            var existing = await _bookRepository.GetByIdAsync(input.Id, ct);
+            var existing = await _bookRepository.GetById(input.Id, ct);
             if (existing is null)
             {
                 return (null as Domain.Models.Book).ToDeleteBookOutput(false, "Book not found");
@@ -38,7 +38,7 @@ namespace DeleteBook
                 return existing.ToDeleteBookOutput(false, dex.Message);
             }
 
-            await _bookRepository.DeleteAsync(input.Id, ct);
+            await _bookRepository.Delete(input.Id, ct);
             return existing.ToDeleteBookOutput(true, "Book deleted");
         }
     }

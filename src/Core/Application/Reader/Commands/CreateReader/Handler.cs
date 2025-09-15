@@ -17,7 +17,7 @@ namespace CreateReader
             _validator = validator;
         }
 
-        public async Task<CreateReaderCommandOutput> HandleAsync(CreateReaderCommandInput input, CancellationToken ct = default)
+        public async Task<CreateReaderCommandOutput> Handle(CreateReaderCommandInput input, CancellationToken ct = default)
         {
             await _validator.ValidateAndThrowAsync(input, ct);
 
@@ -31,7 +31,7 @@ namespace CreateReader
                 throw new InvalidOperationException(ex.Message);
             }
 
-            var created = await _readerRepository.CreateAsync(reader, ct);
+            var created = await _readerRepository.Create(reader, ct);
 
             return created.ToCreateReaderOutput();
         }

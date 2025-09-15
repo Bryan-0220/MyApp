@@ -38,7 +38,7 @@ namespace EntryPoint.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateReaderCommandInput input)
         {
-            var result = await _createReaderHandler.HandleAsync(input, HttpContext.RequestAborted);
+            var result = await _createReaderHandler.Handle(input, HttpContext.RequestAborted);
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
 
@@ -46,7 +46,7 @@ namespace EntryPoint.Controllers
         public async Task<IActionResult> Update(string id, [FromBody] UpdateReaderCommandInput input)
         {
             input.Id = id;
-            var updated = await _updateReaderHandler.HandleAsync(input, HttpContext.RequestAborted);
+            var updated = await _updateReaderHandler.Handle(input, HttpContext.RequestAborted);
             if (updated is null) return NotFound();
             return Ok(updated);
         }
@@ -54,7 +54,7 @@ namespace EntryPoint.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)
         {
-            var result = await _deleteReaderHandler.HandleAsync(new DeleteReaderCommandInput { Id = id }, HttpContext.RequestAborted);
+            var result = await _deleteReaderHandler.Handle(new DeleteReaderCommandInput { Id = id }, HttpContext.RequestAborted);
             if (!result.Success) return NotFound();
             return NoContent();
         }
@@ -62,7 +62,7 @@ namespace EntryPoint.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var readers = await _getAllReadersQueryHandler.HandleAsync(new GetAllReadersQueryInput(), HttpContext.RequestAborted);
+            var readers = await _getAllReadersQueryHandler.Handle(new GetAllReadersQueryInput(), HttpContext.RequestAborted);
             return Ok(readers);
         }
 
@@ -70,14 +70,14 @@ namespace EntryPoint.Controllers
         public async Task<IActionResult> Filter([FromQuery] string? firstName, [FromQuery] string? lastName)
         {
             var input = new FilterReadersQueryInput { FirstName = firstName, LastName = lastName };
-            var readers = await _filterReadersQueryHandler.HandleAsync(input, HttpContext.RequestAborted);
+            var readers = await _filterReadersQueryHandler.Handle(input, HttpContext.RequestAborted);
             return Ok(readers);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(string id)
         {
-            var reader = await _getReaderByIdQueryHandler.HandleAsync(new GetReaderByIdQueryInput { Id = id }, HttpContext.RequestAborted);
+            var reader = await _getReaderByIdQueryHandler.Handle(new GetReaderByIdQueryInput { Id = id }, HttpContext.RequestAborted);
             if (reader == null) return NotFound();
             return Ok(reader);
         }

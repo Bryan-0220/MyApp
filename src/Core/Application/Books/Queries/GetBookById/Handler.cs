@@ -11,9 +11,9 @@ namespace GetBookById
             _bookRepository = bookRepository;
         }
 
-        public async Task<GetBookByIdQueryOutput?> HandleAsync(GetBookByIdQueryInput query, CancellationToken ct = default)
+        public async Task<GetBookByIdQueryOutput?> Handle(GetBookByIdQueryInput query, CancellationToken ct = default)
         {
-            var book = await _bookRepository.GetByIdAsync(query.Id, ct);
+            var book = await _bookRepository.GetById(query.Id, ct);
             if (book is null) return null;
 
             return new GetBookByIdQueryOutput

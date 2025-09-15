@@ -2,6 +2,6 @@ namespace GetAuthorById
 {
     public interface IGetAuthorByIdQueryHandler
     {
-        Task<GetAuthorByIdQueryOutput?> HandleAsync(GetAuthorByIdQueryInput query, CancellationToken ct = default);
+        Task<GetAuthorByIdQueryOutput?> Handle(GetAuthorByIdQueryInput query, CancellationToken ct = default);
     }
 }

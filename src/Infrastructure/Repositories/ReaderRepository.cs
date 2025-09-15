@@ -16,19 +16,19 @@ namespace Infrastructure.Repositories
             _readers = database.GetCollection<Reader>("readers");
         }
 
-        public async Task<Reader> CreateAsync(Reader entity, CancellationToken ct = default)
+        public async Task<Reader> Create(Reader entity, CancellationToken ct = default)
         {
             await _readers.InsertOneAsync(entity, cancellationToken: ct);
             return entity;
         }
 
-        public async Task<bool> DeleteAsync(string id, CancellationToken ct = default)
+        public async Task<bool> Delete(string id, CancellationToken ct = default)
         {
             var res = await _readers.DeleteOneAsync(r => r.Id == id, ct);
             return res.DeletedCount > 0;
         }
 
-        public async Task<IEnumerable<Reader>> FilterAsync(ReaderFilter? filter = null, CancellationToken ct = default)
+        public async Task<IEnumerable<Reader>> Filter(ReaderFilter? filter = null, CancellationToken ct = default)
         {
             var builder = Builders<Reader>.Filter;
             var f = builder.Empty;
@@ -46,30 +46,30 @@ namespace Infrastructure.Repositories
             return await cursor.ToListAsync(ct);
         }
 
-        public async Task<IEnumerable<Reader>> GetAllAsync(CancellationToken ct = default)
+        public async Task<IEnumerable<Reader>> GetAll(CancellationToken ct = default)
         {
             var cursor = await _readers.FindAsync(Builders<Reader>.Filter.Empty, cancellationToken: ct);
             return await cursor.ToListAsync(ct);
         }
 
-        public async Task<Reader?> GetByIdAsync(string id, CancellationToken ct = default)
+        public async Task<Reader?> GetById(string id, CancellationToken ct = default)
         {
             var cursor = await _readers.FindAsync(r => r.Id == id, cancellationToken: ct);
             return await cursor.FirstOrDefaultAsync(ct);
         }
 
-        public async Task<long> CountAsync(Expression<Func<Reader, bool>>? predicate = null, CancellationToken ct = default)
+        public async Task<long> Count(Expression<Func<Reader, bool>>? predicate = null, CancellationToken ct = default)
         {
             if (predicate == null) return await _readers.CountDocumentsAsync(Builders<Reader>.Filter.Empty, cancellationToken: ct);
             return await _readers.CountDocumentsAsync(Builders<Reader>.Filter.Where(predicate), cancellationToken: ct);
         }
 
-        public async Task<IEnumerable<Reader>> ListAsync(CancellationToken ct = default)
+        public async Task<IEnumerable<Reader>> List(CancellationToken ct = default)
         {
-            return await GetAllAsync(ct);
+            return await GetAll(ct);
         }
 
-        public async Task<bool> UpdateAsync(string id, Reader entity, CancellationToken ct = default)
+        public async Task<bool> Update(string id, Reader entity, CancellationToken ct = default)
         {
             try
             {
@@ -82,9 +82,9 @@ namespace Infrastructure.Repositories
             }
         }
 
-        public async Task UpdateAsync(Reader entity, CancellationToken ct = default)
+        public async Task Update(Reader entity, CancellationToken ct = default)
         {
-            await UpdateAsync(entity.Id, entity, ct);
+            await Update(entity.Id, entity, ct);
         }
     }
 }

@@ -16,7 +16,7 @@ namespace FilterBooks
             _validator = validator;
         }
 
-        public async Task<IEnumerable<FilterBooksQueryOutput>> HandleAsync(FilterBooksQueryInput input, CancellationToken ct = default)
+        public async Task<IEnumerable<FilterBooksQueryOutput>> Handle(FilterBooksQueryInput input, CancellationToken ct = default)
         {
             await _validator.ValidateAndThrowAsync(input, ct);
 
@@ -26,7 +26,7 @@ namespace FilterBooks
                 Genre = genre
             };
 
-            var books = await _bookRepository.FilterAsync(filter, ct);
+            var books = await _bookRepository.Filter(filter, ct);
 
             return books.Select(book => book.ToFilterBooksOutput());
         }

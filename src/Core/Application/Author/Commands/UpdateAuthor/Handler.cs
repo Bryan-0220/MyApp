@@ -17,11 +17,11 @@ namespace UpdateAuthor
             _validator = validator;
         }
 
-        public async Task<UpdateAuthorCommandOutput?> HandleAsync(UpdateAuthorCommandInput input, CancellationToken ct = default)
+        public async Task<UpdateAuthorCommandOutput?> Handle(UpdateAuthorCommandInput input, CancellationToken ct = default)
         {
             await _validator.ValidateAndThrowAsync(input, ct);
 
-            var existing = await _authorRepository.GetByIdAsync(input.Id, ct);
+            var existing = await _authorRepository.GetById(input.Id, ct);
             if (existing is null) return null;
 
             try
@@ -33,7 +33,7 @@ namespace UpdateAuthor
                 throw new InvalidOperationException(ex.Message);
             }
 
-            await _authorRepository.UpdateAsync(existing, ct);
+            await _authorRepository.Update(existing, ct);
 
             return existing.ToUpdateAuthorOutput();
         }
