@@ -10,6 +10,18 @@ namespace Application.Loans.Mappers
 {
     public static class LoanMapper
     {
+        public static Domain.Models.LoanData ToData(this CreateLoan.CreateLoanCommandInput input)
+        {
+            if (input == null) return null!;
+
+            return new Domain.Models.LoanData
+            {
+                BookId = input.BookId?.Trim() ?? string.Empty,
+                ReaderId = input.ReaderId?.Trim() ?? string.Empty,
+                LoanDate = input.LoanDate,
+                DueDate = input.DueDate
+            };
+        }
         public static GetAllLoansQueryOutput ToGetAllLoansOutput(this Loan loan)
         {
             return new GetAllLoansQueryOutput

@@ -48,15 +48,15 @@ namespace CreateLoan
 
             await _bookService.DecreaseCopiesOrThrow(input.BookId, ct);
 
-            var now = DateOnly.FromDateTime(DateTime.UtcNow);
-
-            var loan = new Loan
+            Loan loan;
+            try
             {
-                BookId = input.BookId,
-                ReaderId = input.ReaderId,
-                LoanDate = input.LoanDate ?? now,
-                DueDate = input.DueDate ?? now.AddDays(DefaultLoanDays)
-            };
+                loan = Loan.Create(input.ToData());
+            }
+            catch (DomainException ex)
+            {
+                throw new InvalidOperationException(ex.Message);
+            }
 
             try
             {
