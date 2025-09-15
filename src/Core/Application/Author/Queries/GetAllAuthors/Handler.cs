@@ -1,4 +1,5 @@
 using Application.Interfaces;
+using Application.Authors.Mappers;
 
 namespace GetAllAuthors
 {
@@ -15,16 +16,7 @@ namespace GetAllAuthors
         {
             var authors = await _authorRepository.GetAllAsync(ct);
 
-            var projected = authors.Select(a => new GetAllAuthorsQueryOutput
-            {
-                Id = a.Id,
-                Name = a.Name,
-                Bio = a.Bio,
-                Nationality = string.IsNullOrWhiteSpace(a.Nationality) ? null : a.Nationality,
-                BirthDate = a.BirthDate,
-                DeathDate = a.DeathDate,
-                Genres = a.Genres == null ? Array.Empty<string>() : Enumerable.ToArray(a.Genres)
-            });
+            var projected = authors.Select(a => a.ToGetAllAuthorsOutput());
 
             return projected;
         }

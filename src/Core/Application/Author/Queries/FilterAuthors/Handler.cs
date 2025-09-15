@@ -1,6 +1,7 @@
 using Application.Interfaces;
 using FluentValidation;
 using Application.Filters;
+using Application.Authors.Mappers;
 
 namespace FilterAuthors
 {
@@ -29,16 +30,7 @@ namespace FilterAuthors
 
             var authors = await _authorRepository.FilterAsync(filter, ct);
 
-            return authors.Select(a => new FilterAuthorsQueryOutput
-            {
-                Id = a.Id,
-                Name = a.Name,
-                Bio = a.Bio,
-                Nationality = string.IsNullOrWhiteSpace(a.Nationality) ? null : a.Nationality,
-                BirthDate = a.BirthDate,
-                DeathDate = a.DeathDate,
-                Genres = a.Genres == null ? Array.Empty<string>() : Enumerable.ToArray(a.Genres)
-            });
+            return authors.Select(a => a.ToFilterAuthorsOutput());
         }
     }
 }

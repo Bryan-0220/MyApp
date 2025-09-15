@@ -1,6 +1,7 @@
 using Domain.Models;
 using Domain.Common;
 using Application.Interfaces;
+using Application.Authors.Mappers;
 using FluentValidation;
 
 namespace CreateAuthor
@@ -36,16 +37,7 @@ namespace CreateAuthor
 
             var created = await _authorRepository.CreateAsync(author, ct);
 
-            return new CreateAuthorCommandOutput
-            {
-                Id = created.Id,
-                Name = created.Name,
-                Bio = created.Bio,
-                Nationality = string.IsNullOrWhiteSpace(created.Nationality) ? null : created.Nationality,
-                BirthDate = created.BirthDate,
-                DeathDate = created.DeathDate,
-                Genres = (created.Genres == null) ? Array.Empty<string>() : Enumerable.ToArray(created.Genres)
-            };
+            return created.ToOutput();
         }
     }
 }

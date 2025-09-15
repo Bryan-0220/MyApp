@@ -1,4 +1,5 @@
 using Application.Interfaces;
+using Application.Authors.Mappers;
 using Domain.Models;
 using Domain.Common;
 using FluentValidation;
@@ -34,16 +35,7 @@ namespace UpdateAuthor
 
             await _authorRepository.UpdateAsync(existing, ct);
 
-            return new UpdateAuthorCommandOutput
-            {
-                Id = existing.Id,
-                Name = existing.Name,
-                Bio = existing.Bio,
-                Nationality = string.IsNullOrWhiteSpace(existing.Nationality) ? null : existing.Nationality,
-                BirthDate = existing.BirthDate,
-                DeathDate = existing.DeathDate,
-                Genres = existing.Genres == null ? Array.Empty<string>() : Enumerable.ToArray(existing.Genres)
-            };
+            return existing.ToUpdateAuthorOutput();
         }
 
         private static void applyAttributes(UpdateAuthorCommandInput input, Author existing)

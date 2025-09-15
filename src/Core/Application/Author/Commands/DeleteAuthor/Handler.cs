@@ -1,4 +1,5 @@
 using Application.Interfaces;
+using Application.Authors.Mappers;
 using FluentValidation;
 using Application.Authors.Services;
 using Domain.Common;
@@ -25,11 +26,7 @@ namespace DeleteAuthor
             var existing = await _authorRepository.GetByIdAsync(input.Id, ct);
             if (existing is null)
             {
-                return new DeleteAuthorCommandOutput
-                {
-                    Success = false,
-                    Message = "Author not found"
-                };
+                return (null as Domain.Models.Author).ToDeleteOutput(false, "Author not found");
             }
 
             try
@@ -38,19 +35,11 @@ namespace DeleteAuthor
             }
             catch (DomainException dex)
             {
-                return new DeleteAuthorCommandOutput
-                {
-                    Success = false,
-                    Message = dex.Message
-                };
+                return existing.ToDeleteOutput(false, dex.Message);
             }
 
             await _authorRepository.DeleteAsync(input.Id, ct);
-            return new DeleteAuthorCommandOutput
-            {
-                Success = true,
-                Message = "Author deleted"
-            };
+            return existing.ToDeleteOutput(true, "Author deleted");
         }
     }
 }
