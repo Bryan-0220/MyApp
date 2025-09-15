@@ -21,21 +21,21 @@ namespace UpdateLoan
         {
             await _validator.ValidateAndThrowAsync(input, ct);
 
-            var existing = await _loanRepository.GetById(input.Id, ct);
-            if (existing is null) return null;
+            var loanToUpdate = await _loanRepository.GetById(input.Id, ct);
+            if (loanToUpdate is null) return null;
 
             try
             {
-                ApplyUpdates(input, existing);
+                ApplyUpdates(input, loanToUpdate);
             }
             catch (DomainException ex)
             {
                 throw new InvalidOperationException(ex.Message, ex);
             }
 
-            await _loanRepository.Update(existing, ct);
+            await _loanRepository.Update(loanToUpdate, ct);
 
-            return existing.ToUpdateLoanOutput();
+            return loanToUpdate.ToUpdateLoanOutput();
         }
 
         private static void ApplyUpdates(UpdateLoanCommandInput input, Loan existing)

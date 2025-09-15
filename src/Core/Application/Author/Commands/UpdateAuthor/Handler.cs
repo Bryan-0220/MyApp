@@ -21,21 +21,21 @@ namespace UpdateAuthor
         {
             await _validator.ValidateAndThrowAsync(input, ct);
 
-            var existing = await _authorRepository.GetById(input.Id, ct);
-            if (existing is null) return null;
+            var authorToUpdate = await _authorRepository.GetById(input.Id, ct);
+            if (authorToUpdate is null) return null;
 
             try
             {
-                applyAttributes(input, existing);
+                applyAttributes(input, authorToUpdate);
             }
             catch (DomainException ex)
             {
                 throw new InvalidOperationException(ex.Message);
             }
 
-            await _authorRepository.Update(existing, ct);
+            await _authorRepository.Update(authorToUpdate, ct);
 
-            return existing.ToUpdateAuthorOutput();
+            return authorToUpdate.ToUpdateAuthorOutput();
         }
 
         private static void applyAttributes(UpdateAuthorCommandInput input, Author existing)

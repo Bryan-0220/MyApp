@@ -20,21 +20,21 @@ namespace UpdateReader
         {
             await _validator.ValidateAndThrowAsync(input, ct);
 
-            var existing = await _readerRepository.GetById(input.Id, ct);
-            if (existing is null) return null;
+            var readerToUpdate = await _readerRepository.GetById(input.Id, ct);
+            if (readerToUpdate is null) return null;
 
             try
             {
-                applyAttributes(input, existing);
+                applyAttributes(input, readerToUpdate);
             }
             catch (Exception ex)
             {
                 throw new InvalidOperationException(ex.Message);
             }
 
-            await _readerRepository.Update(existing, ct);
+            await _readerRepository.Update(readerToUpdate, ct);
 
-            return existing.ToUpdateReaderOutput();
+            return readerToUpdate.ToUpdateReaderOutput();
         }
 
         private static void applyAttributes(UpdateReaderCommandInput input, Reader existing)

@@ -20,21 +20,21 @@ namespace UpdateBook
         {
             await _validator.ValidateAndThrowAsync(input, ct);
 
-            var existing = await _bookRepository.GetById(input.Id, ct);
-            if (existing is null) return null;
+            var bookToUpdate = await _bookRepository.GetById(input.Id, ct);
+            if (bookToUpdate is null) return null;
 
             try
             {
-                applyAttributes(input, existing);
+                applyAttributes(input, bookToUpdate);
             }
             catch (Domain.Common.DomainException ex)
             {
                 throw new InvalidOperationException(ex.Message);
             }
 
-            await _bookRepository.Update(existing, ct);
+            await _bookRepository.Update(bookToUpdate, ct);
 
-            return existing.ToUpdateBookOutput();
+            return bookToUpdate.ToUpdateBookOutput();
         }
 
         private static void applyAttributes(UpdateBookCommandInput input, Book existing)
