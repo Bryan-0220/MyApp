@@ -16,24 +16,25 @@ namespace Domain.Models
 
         public Book() { }
 
-        public static Book Create(string title, string authorId, string? isbn, int? publishedYear, int copiesAvailable, string genre)
+        public static Book Create(BookData data)
         {
-            if (string.IsNullOrWhiteSpace(title)) throw new DomainException("Title is required");
-            if (copiesAvailable < 0) throw new DomainException("CopiesAvailable must be >= 0");
-            if (string.IsNullOrWhiteSpace(genre)) throw new DomainException("Genre is required");
+            if (data == null) throw new DomainException("Input is required");
+            if (string.IsNullOrWhiteSpace(data.Title)) throw new DomainException("Title is required");
+            if (data.CopiesAvailable < 0) throw new DomainException("CopiesAvailable must be >= 0");
+            if (string.IsNullOrWhiteSpace(data.Genre)) throw new DomainException("Genre is required");
 
             var book = new Book
             {
-                Title = title.Trim(),
-                AuthorId = (authorId ?? string.Empty).Trim(),
-                PublishedYear = publishedYear,
-                CopiesAvailable = copiesAvailable,
-                Genre = genre.Trim()
+                Title = data.Title.Trim(),
+                AuthorId = (data.AuthorId ?? string.Empty).Trim(),
+                PublishedYear = data.PublishedYear,
+                CopiesAvailable = data.CopiesAvailable,
+                Genre = data.Genre.Trim()
             };
 
-            if (!string.IsNullOrWhiteSpace(isbn))
+            if (!string.IsNullOrWhiteSpace(data.ISBN))
             {
-                if (!Domain.ValueObjects.Isbn.TryParse(isbn, out var vo, out var error))
+                if (!Domain.ValueObjects.Isbn.TryParse(data.ISBN, out var vo, out var error))
                     throw new DomainException(error ?? "Invalid ISBN");
 
                 book.ISBN = vo!.Value;

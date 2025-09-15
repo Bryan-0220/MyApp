@@ -24,7 +24,7 @@ namespace CreateBook
             Book book;
             try
             {
-                book = Book.Create(input.Title, input.AuthorId, input.ISBN, input.PublishedYear, input.CopiesAvailable, input.Genre);
+                book = Book.Create(input.ToData());
             }
             catch (DomainException ex)
             {

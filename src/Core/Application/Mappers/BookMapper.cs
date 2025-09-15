@@ -9,6 +9,20 @@ namespace Application.Books.Mappers
 {
     public static class BookMapper
     {
+        public static BookData ToData(this CreateBookCommandInput input)
+        {
+            if (input == null) return null!;
+
+            return new BookData
+            {
+                Title = input.Title?.Trim() ?? string.Empty,
+                AuthorId = input.AuthorId?.Trim() ?? string.Empty,
+                ISBN = string.IsNullOrWhiteSpace(input.ISBN) ? null : input.ISBN.Trim(),
+                PublishedYear = input.PublishedYear,
+                CopiesAvailable = input.CopiesAvailable,
+                Genre = input.Genre?.Trim() ?? string.Empty
+            };
+        }
         public static GetAllBooksQueryOutput ToGetAllBooksOutput(this Book book)
         {
             return new GetAllBooksQueryOutput
