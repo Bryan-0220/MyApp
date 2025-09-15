@@ -107,6 +107,10 @@ builder.Services.AddScoped<IValidator<FilterBooksQueryInput>, FilterBooksQueryVa
 // Domain services
 builder.Services.AddScoped<Application.Books.Services.IBookService, Application.Books.Services.BookService>();
 builder.Services.AddScoped<Application.Readers.Services.IReaderService, Application.Readers.Services.ReaderService>();
+builder.Services.AddScoped<Application.Loans.Services.ILoanService, Application.Loans.Services.LoanService>();
+builder.Services.AddScoped<Application.Loans.Services.IDeleteService, Application.Loans.Services.DeleteService>();
+// Author services
+builder.Services.AddScoped<Application.Authors.Services.IAuthorCreationService, Application.Authors.Services.AuthorCreationService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

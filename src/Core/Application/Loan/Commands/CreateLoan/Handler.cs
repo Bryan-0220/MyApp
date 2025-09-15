@@ -1,6 +1,7 @@
 using Domain.Models;
 using Domain.Common;
 using Application.Interfaces;
+using Application.Loans.Services;
 using FluentValidation;
 
 namespace CreateLoan
@@ -15,19 +16,23 @@ namespace CreateLoan
         private readonly ILoanRepository _loanRepository;
         private readonly Application.Books.Services.IBookService _bookService;
         private readonly Application.Readers.Services.IReaderService _readerService;
+        private readonly ILoanService _loanService;
         private readonly IValidator<CreateLoanCommandInput> _validator;
 
         public CreateLoanCommandHandler(
             ILoanRepository loanRepository,
             Application.Books.Services.IBookService bookService,
             Application.Readers.Services.IReaderService readerService,
+            ILoanService loanService,
             IValidator<CreateLoanCommandInput> validator)
         {
             _loanRepository = loanRepository ?? throw new ArgumentNullException(nameof(loanRepository));
             _bookService = bookService ?? throw new ArgumentNullException(nameof(bookService));
             _readerService = readerService ?? throw new ArgumentNullException(nameof(readerService));
+            _loanService = loanService ?? throw new ArgumentNullException(nameof(loanService));
             _validator = validator ?? throw new ArgumentNullException(nameof(validator));
         }
+
 
         public async Task<CreateLoanCommandOutput> HandleAsync(CreateLoanCommandInput input, CancellationToken ct = default)
         {
@@ -37,6 +42,9 @@ namespace CreateLoan
             var reader = await _readerService.EnsureExistsAsync(input.ReaderId, ct);
 
             book.EnsureHasAvailableCopies();
+
+            // ensure there is no duplicate active loan for this book and reader
+            await _loanService.EnsureNoDuplicateLoanAsync(input.BookId, input.ReaderId, ct);
 
             await _bookService.DecreaseCopiesOrThrowAsync(input.BookId, ct);
 
@@ -65,7 +73,6 @@ namespace CreateLoan
                 {
                     throw new DomainException("Failed to create loan and failed to restore book copies.");
                 }
-
                 throw;
             }
         }
