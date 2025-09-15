@@ -9,13 +9,13 @@ namespace DeleteBook
     {
         private readonly IBookRepository _bookRepository;
         private readonly IValidator<DeleteBookCommandInput> _validator;
-        private readonly IBookDeletionService _deletionService;
+        private readonly IBookService _bookService;
 
-        public DeleteBookCommandHandler(IBookRepository bookRepository, IValidator<DeleteBookCommandInput> validator, IBookDeletionService deletionService)
+        public DeleteBookCommandHandler(IBookRepository bookRepository, IValidator<DeleteBookCommandInput> validator, IBookService bookService)
         {
             _bookRepository = bookRepository;
             _validator = validator;
-            _deletionService = deletionService;
+            _bookService = bookService;
         }
 
         public async Task<DeleteBookCommandOutput> HandleAsync(DeleteBookCommandInput input, CancellationToken ct = default)
@@ -34,7 +34,7 @@ namespace DeleteBook
 
             try
             {
-                await _deletionService.EnsureCanDeleteAsync(input.Id, ct);
+                await _bookService.EnsureCanDelete(input.Id, ct);
             }
             catch (DomainException dex)
             {

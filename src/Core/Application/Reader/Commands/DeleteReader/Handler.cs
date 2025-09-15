@@ -7,13 +7,13 @@ namespace DeleteReader
     public class DeleteReaderCommandHandler : IDeleteReaderCommandHandler
     {
         private readonly IReaderRepository _readerRepository;
-        private readonly IReaderDeletionService _deletionService;
+        private readonly IReaderService _readerService;
         private readonly IValidator<DeleteReaderCommandInput> _validator;
 
-        public DeleteReaderCommandHandler(IReaderRepository readerRepository, IReaderDeletionService deletionService, IValidator<DeleteReaderCommandInput> validator)
+        public DeleteReaderCommandHandler(IReaderRepository readerRepository, IReaderService readerService, IValidator<DeleteReaderCommandInput> validator)
         {
             _readerRepository = readerRepository;
-            _deletionService = deletionService;
+            _readerService = readerService;
             _validator = validator;
         }
 
@@ -31,7 +31,7 @@ namespace DeleteReader
                 };
             }
 
-            await _deletionService.EnsureCanDeleteAsync(input.Id, ct);
+            await _readerService.EnsureCanDelete(existing.Id, ct);
 
             await _readerRepository.DeleteAsync(input.Id, ct);
             return new DeleteReaderCommandOutput

@@ -9,13 +9,13 @@ namespace CreateAuthor
     {
         private readonly IAuthorRepository _authorRepository;
         private readonly IValidator<CreateAuthorCommandInput> _validator;
-        private readonly Application.Authors.Services.IAuthorCreationService _creationService;
+        private readonly Application.Authors.Services.IAuthorService _authorService;
 
-        public CreateAuthorCommandHandler(IAuthorRepository authorRepository, IValidator<CreateAuthorCommandInput> validator, Application.Authors.Services.IAuthorCreationService creationService)
+        public CreateAuthorCommandHandler(IAuthorRepository authorRepository, IValidator<CreateAuthorCommandInput> validator, Application.Authors.Services.IAuthorService authorService)
         {
             _authorRepository = authorRepository;
             _validator = validator;
-            _creationService = creationService;
+            _authorService = authorService;
         }
 
         public async Task<CreateAuthorCommandOutput> HandleAsync(CreateAuthorCommandInput input, CancellationToken ct = default)
@@ -25,7 +25,7 @@ namespace CreateAuthor
             Author author;
             try
             {
-                await _creationService.EnsureCanCreateAsync(input.Name, ct);
+                await _authorService.EnsureCanCreateAsync(input.Name, ct);
 
                 author = Author.Create(input.Name, input.Bio, input.Nationality, input.BirthDate, input.DeathDate, input.Genres);
             }

@@ -38,15 +38,14 @@ namespace CreateLoan
         {
             await _validator.ValidateAndThrowAsync(input, ct);
 
-            var book = await _bookService.EnsureExistsAsync(input.BookId, ct);
-            var reader = await _readerService.EnsureExistsAsync(input.ReaderId, ct);
+            var book = await _bookService.EnsureExists(input.BookId, ct);
+            var reader = await _readerService.EnsureExists(input.ReaderId, ct);
 
             book.EnsureHasAvailableCopies();
 
-            // ensure there is no duplicate active loan for this book and reader
             await _loanService.EnsureNoDuplicateLoanAsync(input.BookId, input.ReaderId, ct);
 
-            await _bookService.DecreaseCopiesOrThrowAsync(input.BookId, ct);
+            await _bookService.DecreaseCopiesOrThrow(input.BookId, ct);
 
             var now = DateOnly.FromDateTime(DateTime.UtcNow);
 
@@ -67,7 +66,7 @@ namespace CreateLoan
             {
                 try
                 {
-                    await _bookService.RestoreCopiesAsync(input.BookId, ct);
+                    await _bookService.RestoreCopies(input.BookId, ct);
                 }
                 catch (Exception)
                 {

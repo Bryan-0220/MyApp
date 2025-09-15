@@ -12,16 +12,16 @@ namespace DeleteLoan
 
         private readonly ILoanRepository _loanRepository;
         private readonly IValidator<DeleteLoanCommandInput> _validator;
-        private readonly IDeleteService _deleteService;
+        private readonly ILoanService _loanService;
 
         public DeleteLoanCommandHandler(
             ILoanRepository loanRepository,
             IValidator<DeleteLoanCommandInput> validator,
-            IDeleteService deleteService)
+            ILoanService loanService)
         {
             _loanRepository = loanRepository ?? throw new ArgumentNullException(nameof(loanRepository));
             _validator = validator ?? throw new ArgumentNullException(nameof(validator));
-            _deleteService = deleteService ?? throw new ArgumentNullException(nameof(deleteService));
+            _loanService = loanService ?? throw new ArgumentNullException(nameof(loanService));
         }
 
         public async Task<DeleteLoanCommandOutput> HandleAsync(DeleteLoanCommandInput input, CancellationToken ct = default)
@@ -34,14 +34,14 @@ namespace DeleteLoan
                 return Failure(LoanNotFoundMessage);
             }
 
-            if (!await _deleteService.EnsureCanDeleteAsync(existing, ct))
+            if (!await _loanService.EnsureCanDeleteAsync(existing, ct))
             {
                 return Failure(CannotDeleteActiveMessage);
             }
 
             try
             {
-                await _deleteService.HandlePostDeleteAsync(existing, ct);
+                await _loanService.HandlePostDeleteAsync(existing, ct);
             }
             catch (Exception ex)
             {
