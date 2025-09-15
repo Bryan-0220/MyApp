@@ -10,6 +10,20 @@ namespace Application.Readers.Mappers
 {
     public static class ReaderMapper
     {
+        public static ReaderData ToData(this CreateReaderCommandInput input)
+        {
+            if (input == null) return null!;
+
+            return new ReaderData
+            {
+                FirstName = input.FirstName?.Trim() ?? string.Empty,
+                LastName = input.LastName?.Trim() ?? string.Empty,
+                Email = input.Email?.Trim() ?? string.Empty,
+                MembershipDate = input.MembershipDate
+            };
+        }
+
+
         public static GetAllReadersQueryOutput ToGetAllReadersOutput(this Reader reader)
         {
             return new GetAllReadersQueryOutput

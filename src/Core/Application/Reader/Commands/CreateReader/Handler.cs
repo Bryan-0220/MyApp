@@ -1,4 +1,5 @@
 using Domain.Models;
+using Domain.Common;
 using Application.Interfaces;
 using FluentValidation;
 using Application.Readers.Mappers;
@@ -20,13 +21,15 @@ namespace CreateReader
         {
             await _validator.ValidateAndThrowAsync(input, ct);
 
-            var reader = new Reader
+            Reader reader;
+            try
             {
-                FirstName = input.FirstName,
-                LastName = input.LastName,
-                Email = input.Email,
-                MembershipDate = input.MembershipDate ?? DateOnly.FromDateTime(DateTime.UtcNow)
-            };
+                reader = Reader.Create(input.ToData());
+            }
+            catch (DomainException ex)
+            {
+                throw new InvalidOperationException(ex.Message);
+            }
 
             var created = await _readerRepository.CreateAsync(reader, ct);
 
