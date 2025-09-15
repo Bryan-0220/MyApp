@@ -1,4 +1,5 @@
 using Application.Interfaces;
+using Application.Books.Mappers;
 
 namespace GetAllBooks
 {
@@ -15,17 +16,7 @@ namespace GetAllBooks
         {
             var books = await _bookRepository.GetAllAsync(ct);
 
-            return books.Select(b => new GetAllBooksQueryOutput
-            {
-                Id = b.Id,
-                Title = b.Title,
-                AuthorId = b.AuthorId,
-                ISBN = b.ISBN,
-                PublishedYear = b.PublishedYear,
-                CopiesAvailable = b.CopiesAvailable
-                ,
-                Genre = b.Genre
-            });
+            return books.Select(b => b.ToGetAllBooksOutput());
         }
     }
 }

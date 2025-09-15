@@ -2,6 +2,7 @@ using Application.Interfaces;
 using Application.Books.Services;
 using FluentValidation;
 using Domain.Common;
+using Application.Books.Mappers;
 
 namespace DeleteBook
 {
@@ -25,11 +26,7 @@ namespace DeleteBook
             var existing = await _bookRepository.GetByIdAsync(input.Id, ct);
             if (existing is null)
             {
-                return new DeleteBookCommandOutput
-                {
-                    Success = false,
-                    Message = "Book not found"
-                };
+                return (null as Domain.Models.Book).ToDeleteBookOutput(false, "Book not found");
             }
 
             try
@@ -38,19 +35,11 @@ namespace DeleteBook
             }
             catch (DomainException dex)
             {
-                return new DeleteBookCommandOutput
-                {
-                    Success = false,
-                    Message = dex.Message
-                };
+                return existing.ToDeleteBookOutput(false, dex.Message);
             }
 
             await _bookRepository.DeleteAsync(input.Id, ct);
-            return new DeleteBookCommandOutput
-            {
-                Success = true,
-                Message = "Book deleted"
-            };
+            return existing.ToDeleteBookOutput(true, "Book deleted");
         }
     }
 }

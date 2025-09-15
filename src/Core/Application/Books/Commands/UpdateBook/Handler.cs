@@ -1,6 +1,7 @@
 using Application.Interfaces;
 using Domain.Models;
 using FluentValidation;
+using Application.Books.Mappers;
 
 namespace UpdateBook
 {
@@ -33,15 +34,7 @@ namespace UpdateBook
 
             await _bookRepository.UpdateAsync(existing, ct);
 
-            return new UpdateBookCommandOutput
-            {
-                Id = existing.Id,
-                Title = existing.Title,
-                AuthorId = existing.AuthorId,
-                ISBN = existing.ISBN,
-                PublishedYear = existing.PublishedYear,
-                CopiesAvailable = existing.CopiesAvailable
-            };
+            return existing.ToUpdateBookOutput();
         }
 
         private static void applyAttributes(UpdateBookCommandInput input, Book existing)

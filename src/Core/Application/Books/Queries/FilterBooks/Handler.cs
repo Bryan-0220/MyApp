@@ -1,6 +1,7 @@
 using Application.Interfaces;
 using Application.Filters;
 using FluentValidation;
+using Application.Books.Mappers;
 
 namespace FilterBooks
 {
@@ -27,16 +28,7 @@ namespace FilterBooks
 
             var books = await _bookRepository.FilterAsync(filter, ct);
 
-            return books.Select(book => new FilterBooksQueryOutput
-            {
-                Id = book.Id,
-                Title = book.Title,
-                AuthorId = book.AuthorId,
-                ISBN = book.ISBN,
-                PublishedYear = book.PublishedYear,
-                CopiesAvailable = book.CopiesAvailable,
-                Genre = book.Genre
-            });
+            return books.Select(book => book.ToFilterBooksOutput());
         }
     }
 }

@@ -2,6 +2,7 @@ using Domain.Models;
 using Domain.Common;
 using Application.Interfaces;
 using FluentValidation;
+using Application.Books.Mappers;
 
 namespace CreateBook
 {
@@ -32,17 +33,7 @@ namespace CreateBook
 
             var created = await _bookRepository.CreateAsync(book, ct);
 
-            return new CreateBookCommandOutput
-            {
-                Id = created.Id,
-                Title = created.Title,
-                AuthorId = created.AuthorId,
-                ISBN = created.ISBN,
-                PublishedYear = created.PublishedYear,
-                CopiesAvailable = created.CopiesAvailable,
-                Genre = created.Genre
-
-            };
+            return created.ToCreateBookOutput();
         }
     }
 }
