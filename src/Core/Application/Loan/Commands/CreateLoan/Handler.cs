@@ -3,6 +3,7 @@ using Domain.Common;
 using Application.Interfaces;
 using Application.Loans.Services;
 using FluentValidation;
+using Application.Loans.Mappers;
 
 namespace CreateLoan
 {
@@ -60,7 +61,7 @@ namespace CreateLoan
             try
             {
                 var created = await _loanRepository.CreateAsync(loan, ct);
-                return MapToOutput(created);
+                return created.ToCreateLoanOutput();
             }
             catch (Exception)
             {
@@ -76,18 +77,5 @@ namespace CreateLoan
             }
         }
 
-        private CreateLoanCommandOutput MapToOutput(Loan created)
-        {
-            return new CreateLoanCommandOutput
-            {
-                Id = created.Id,
-                BookId = created.BookId,
-                ReaderId = created.ReaderId,
-                LoanDate = created.LoanDate,
-                DueDate = created.DueDate,
-                ReturnedDate = created.ReturnedDate,
-                Status = created.Status.ToString()
-            };
-        }
     }
 }

@@ -1,4 +1,5 @@
 using Application.Interfaces;
+using Application.Loans.Mappers;
 
 namespace GetAllLoans
 {
@@ -15,16 +16,7 @@ namespace GetAllLoans
         {
             var loans = await _loanRepository.GetAllAsync(ct);
 
-            return loans.Select(b => new GetAllLoansQueryOutput
-            {
-                Id = b.Id,
-                BookId = b.BookId,
-                ReaderId = b.ReaderId,
-                LoanDate = b.LoanDate,
-                DueDate = b.DueDate,
-                ReturnedDate = b.ReturnedDate,
-                Status = b.Status.ToString()
-            });
+            return loans.Select(b => b.ToGetAllLoansOutput());
         }
     }
 }

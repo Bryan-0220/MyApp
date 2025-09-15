@@ -1,4 +1,5 @@
 using Application.Interfaces;
+using Application.Loans.Mappers;
 
 namespace GetLoanById
 {
@@ -16,16 +17,7 @@ namespace GetLoanById
             var loan = await _loanRepository.GetByIdAsync(query.Id, ct);
             if (loan is null) return null;
 
-            return new GetLoanByIdQueryOutput
-            {
-                Id = loan.Id,
-                BookId = loan.BookId,
-                ReaderId = loan.ReaderId,
-                LoanDate = loan.LoanDate,
-                DueDate = loan.DueDate,
-                ReturnedDate = loan.ReturnedDate,
-                Status = loan.Status.ToString()
-            };
+            return loan.ToGetLoanByIdOutput();
         }
     }
 }

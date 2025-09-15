@@ -2,6 +2,7 @@ using Application.Interfaces;
 using Domain.Models;
 using Domain.Common;
 using FluentValidation;
+using Application.Loans.Mappers;
 
 namespace UpdateLoan
 {
@@ -34,7 +35,7 @@ namespace UpdateLoan
 
             await _loanRepository.UpdateAsync(existing, ct);
 
-            return MapToOutput(existing);
+            return existing.ToUpdateLoanOutput();
         }
 
         private static void ApplyUpdates(UpdateLoanCommandInput input, Loan existing)
@@ -60,20 +61,5 @@ namespace UpdateLoan
                     existing.Status = st;
             }
         }
-
-        private UpdateLoanCommandOutput MapToOutput(Loan existing)
-        {
-            return new UpdateLoanCommandOutput
-            {
-                Id = existing.Id,
-                BookId = existing.BookId,
-                ReaderId = existing.ReaderId,
-                LoanDate = existing.LoanDate,
-                DueDate = existing.DueDate,
-                ReturnedDate = existing.ReturnedDate,
-                Status = existing.Status.ToString()
-            };
-        }
-
     }
 }

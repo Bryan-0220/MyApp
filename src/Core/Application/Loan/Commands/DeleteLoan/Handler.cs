@@ -1,6 +1,7 @@
 using Application.Interfaces;
 using FluentValidation;
 using Application.Loans.Services;
+using Application.Loans.Mappers;
 
 namespace DeleteLoan
 {
@@ -31,12 +32,12 @@ namespace DeleteLoan
             var existing = await _loanRepository.GetByIdAsync(input.Id, ct);
             if (existing is null)
             {
-                return Failure(LoanNotFoundMessage);
+                return (null as Domain.Models.Loan).ToDeleteLoanOutput(false, LoanNotFoundMessage);
             }
 
             if (!await _loanService.EnsureCanDeleteAsync(existing, ct))
             {
-                return Failure(CannotDeleteActiveMessage);
+                return existing.ToDeleteLoanOutput(false, CannotDeleteActiveMessage);
             }
 
             try
@@ -45,21 +46,12 @@ namespace DeleteLoan
             }
             catch (Exception ex)
             {
-                return Failure(ex.Message);
+                return existing.ToDeleteLoanOutput(false, ex.Message);
             }
 
             await _loanRepository.DeleteAsync(input.Id, ct);
-            return Success();
+            return existing.ToDeleteLoanOutput(true, LoanDeletedMessage);
         }
 
-        private static DeleteLoanCommandOutput Failure(string message)
-        {
-            return new DeleteLoanCommandOutput { Deleted = false, Message = message };
-        }
-
-        private static DeleteLoanCommandOutput Success()
-        {
-            return new DeleteLoanCommandOutput { Deleted = true, Message = LoanDeletedMessage };
-        }
     }
 }
