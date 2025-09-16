@@ -3,13 +3,14 @@ using Application.Interfaces;
 using Domain.Common;
 using Domain.Models;
 using Application.Books.Services;
+using Domain.Results;
 
 namespace Application.Loans.Services
 {
     public class LoanService : ILoanService
     {
         private readonly ILoanRepository _loanRepository;
-        private readonly Application.Books.Services.IBookService _bookService;
+        private readonly IBookService _bookService;
 
         public LoanService(ILoanRepository loanRepository, IBookService bookService)
         {
@@ -33,33 +34,62 @@ namespace Application.Loans.Services
             }
         }
 
+        //     public async Task<DeleteLoan.DeleteLoanCommandOutput> DeleteLoanById(string loanId, CancellationToken ct = default)
+        //     {
+        //         var loanToDelete = await _loanRepository.GetById(loanId, ct);
+        //         if (loanToDelete is null)
+        //             return (null as Loan).ToDeleteLoanOutput(false, "Loan not found.");
 
+        //         if (!loanToDelete.CanBeDeleted(out var cannotDeleteReason))
+        //             return loanToDelete.ToDeleteLoanOutput(false, cannotDeleteReason);
 
+        //         try
+        //         {
+        //             await _bookService.RestoreCopies(loanToDelete.BookId, ct);
+        //         }
+        //         catch (Exception ex)
+        //         {
+        //             return loanToDelete.ToDeleteLoanOutput(false, ex.Message);
+        //         }
 
-        public Task<bool> EnsureCanDelete(Loan loan, CancellationToken ct = default)
+        //         await _loanRepository.Delete(loanId, ct);
+        //         return loanToDelete.ToDeleteLoanOutput(true, "Loan deleted.");
+        //     }
+        // }
+
+        public async Task<Result<Loan>> DeleteLoanById(string loanId, CancellationToken ct = default)
         {
-            if (loan is null) throw new DomainException("Loan is null");
+            var loan = await _loanRepository.GetById(loanId, ct);
+            if (loan is null)
+                return Result<Loan>.Fail("Loan not found.");
 
-            if (loan.Status != LoanStatus.Returned)
-            {
-                return Task.FromResult(false);
-            }
+            if (!loan.CanBeDeleted(out var reason))
+                return Result<Loan>.Fail(reason ?? "Loan cannot be deleted for an unspecified reason.");
 
-            return Task.FromResult(true);
+            var restoreResult = await TryRestoreCopies(loan.BookId, ct);
+            if (!restoreResult.Success)
+                return Result<Loan>.Fail(restoreResult.Message);
+
+            await _loanRepository.Delete(loanId, ct);
+            return Result<Loan>.Ok(loan, "Loan deleted.");
         }
 
-        public async Task HandlePostDelete(Loan loan, CancellationToken ct = default)
+        private async Task<(bool Success, string Message)> TryRestoreCopies(string bookId, CancellationToken ct)
         {
-            if (loan is null) throw new DomainException("Loan is null");
-
             try
             {
-                await _bookService.RestoreCopies(loan.BookId, ct);
+                await _bookService.RestoreCopies(bookId, ct);
+                return (true, string.Empty);
             }
-            catch (System.Exception ex)
+            catch (DomainException ex)
             {
-                throw new DomainException($"Failed to restore book copies for book {loan.BookId}: {ex.Message}");
+                return (false, ex.Message);
+            }
+            catch (Exception)
+            {
+                return (false, "Unexpected error restoring book copies.");
             }
         }
+
     }
 }

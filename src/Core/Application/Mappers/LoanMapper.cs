@@ -5,6 +5,7 @@ using FilterLoans;
 using CreateLoan;
 using UpdateLoan;
 using DeleteLoan;
+using Domain.Results;
 
 namespace Application.Loans.Mappers
 {
@@ -92,12 +93,13 @@ namespace Application.Loans.Mappers
             };
         }
 
-        public static DeleteLoanCommandOutput ToDeleteLoanOutput(this Loan? loan, bool deleted, string? message = null)
+        public static DeleteLoanCommandOutput ToDeleteLoanOutput(this Result<Loan> result)
         {
             return new DeleteLoanCommandOutput
             {
-                Deleted = deleted,
-                Message = message
+                Success = result.Success,
+                Message = result.Message,
+                LoanId = result.Value?.Id
             };
         }
     }

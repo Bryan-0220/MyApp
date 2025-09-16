@@ -49,5 +49,16 @@ namespace Domain.Models
 
             return loan;
         }
+
+        public bool CanBeDeleted(out string? reason)
+        {
+            if (this.Status != LoanStatus.Returned)
+            {
+                reason = "Cannot delete an active or overdue loan. Mark it as returned before deletion.";
+                return false;
+            }
+            reason = null;
+            return true;
+        }
     }
 }
