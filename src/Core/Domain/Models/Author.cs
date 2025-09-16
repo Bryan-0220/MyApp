@@ -23,22 +23,31 @@ namespace Domain.Models
             if (string.IsNullOrWhiteSpace(input.Name)) throw new DomainException("Name is required");
             if (input.BirthDate.HasValue && input.DeathDate.HasValue && input.DeathDate < input.BirthDate) throw new DomainException("DeathDate cannot be before BirthDate");
 
+            if (input.Genres == null)
+                throw new DomainException("Genres are required");
+
+            // Ensure there's at least one non-empty genre before creating the object
+            var hasAnyGenre = input.Genres.Any(g => !string.IsNullOrWhiteSpace(g));
+            if (!hasAnyGenre)
+                throw new DomainException("At least one genre is required");
+
+            if (string.IsNullOrWhiteSpace(input.Nationality))
+                throw new DomainException("Nationality is required");
+
             var a = new Author
             {
-                Name = input.Name.Trim(),
-                Bio = string.IsNullOrWhiteSpace(input.Bio) ? null : input.Bio.Trim(),
-                Nationality = (input.Nationality ?? string.Empty).Trim(),
+                Name = StringNormalizer.Normalize(input.Name) ?? string.Empty,
+                Bio = string.IsNullOrWhiteSpace(input.Bio) ? null : StringNormalizer.Normalize(input.Bio),
+                Nationality = StringNormalizer.Normalize(input.Nationality) ?? string.Empty,
                 BirthDate = input.BirthDate,
                 DeathDate = input.DeathDate
             };
 
-            if (input.Genres != null)
+            a.Genres = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var g in input.Genres)
             {
-                foreach (var g in input.Genres)
-                {
-                    if (string.IsNullOrWhiteSpace(g)) continue;
-                    a.Genres.Add(g.Trim());
-                }
+                if (string.IsNullOrWhiteSpace(g)) continue;
+                a.Genres.Add(StringNormalizer.Normalize(g)!);
             }
 
             return a;
@@ -47,17 +56,17 @@ namespace Domain.Models
         public void SetName(string name)
         {
             if (string.IsNullOrWhiteSpace(name)) throw new DomainException("Name is required");
-            Name = name.Trim();
+            Name = StringNormalizer.Normalize(name) ?? string.Empty;
         }
 
         public void SetBio(string? bio)
         {
-            Bio = string.IsNullOrWhiteSpace(bio) ? null : bio.Trim();
+            Bio = string.IsNullOrWhiteSpace(bio) ? null : StringNormalizer.Normalize(bio);
         }
 
         public void SetNationality(string nationality)
         {
-            Nationality = (nationality ?? string.Empty).Trim();
+            Nationality = StringNormalizer.Normalize(nationality) ?? string.Empty;
         }
 
         public void SetBirthDate(DateOnly? birthDate)
@@ -75,7 +84,7 @@ namespace Domain.Models
         public void AddGenre(string genre)
         {
             if (string.IsNullOrWhiteSpace(genre)) throw new DomainException("Genre is required");
-            Genres.Add(genre.Trim());
+            Genres.Add(StringNormalizer.Normalize(genre)!);
         }
 
         public void RemoveGenre(string genre)
@@ -91,7 +100,7 @@ namespace Domain.Models
             foreach (var g in genres)
             {
                 if (string.IsNullOrWhiteSpace(g)) continue;
-                Genres.Add(g.Trim());
+                Genres.Add(StringNormalizer.Normalize(g)!);
             }
         }
     }

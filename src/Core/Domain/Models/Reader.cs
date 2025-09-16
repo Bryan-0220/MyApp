@@ -8,7 +8,7 @@ namespace Domain.Models
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
-        public DateOnly MembershipDate { get; set; } = DateOnly.FromDateTime(DateTime.UtcNow);
+        public DateOnly MembershipDate { get; set; }
 
         public static Reader Create(ReaderData data)
         {
@@ -18,12 +18,20 @@ namespace Domain.Models
             if (string.IsNullOrWhiteSpace(data.LastName)) throw new DomainException("LastName is required");
             if (string.IsNullOrWhiteSpace(data.Email)) throw new DomainException("Email is required");
 
+            var first = StringNormalizer.Normalize(data.FirstName);
+            var last = StringNormalizer.Normalize(data.LastName);
+            var email = StringNormalizer.Normalize(data.Email);
+
+
+            if (!data.MembershipDate.HasValue)
+                throw new DomainException("MembershipDate is required");
+
             return new Reader
             {
-                FirstName = data.FirstName.Trim(),
-                LastName = data.LastName.Trim(),
-                Email = data.Email.Trim(),
-                MembershipDate = data.MembershipDate ?? DateOnly.FromDateTime(DateTime.UtcNow)
+                FirstName = first ?? string.Empty,
+                LastName = last ?? string.Empty,
+                Email = email ?? string.Empty,
+                MembershipDate = data.MembershipDate.Value
             };
         }
     }

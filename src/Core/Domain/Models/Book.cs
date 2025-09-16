@@ -1,5 +1,6 @@
 using MongoDB.Bson.Serialization.Attributes;
 using Domain.Common;
+using Domain.ValueObjects;
 
 namespace Domain.Models
 {
@@ -21,20 +22,21 @@ namespace Domain.Models
             if (data == null) throw new DomainException("Input is required");
             if (string.IsNullOrWhiteSpace(data.Title)) throw new DomainException("Title is required");
             if (data.CopiesAvailable < 0) throw new DomainException("CopiesAvailable must be >= 0");
+            if (string.IsNullOrWhiteSpace(data.AuthorId)) throw new DomainException("AuthorId is required");
             if (string.IsNullOrWhiteSpace(data.Genre)) throw new DomainException("Genre is required");
 
             var book = new Book
             {
-                Title = data.Title.Trim(),
-                AuthorId = (data.AuthorId ?? string.Empty).Trim(),
+                Title = StringNormalizer.Normalize(data.Title) ?? string.Empty,
+                AuthorId = StringNormalizer.Normalize(data.AuthorId) ?? string.Empty,
                 PublishedYear = data.PublishedYear,
                 CopiesAvailable = data.CopiesAvailable,
-                Genre = data.Genre.Trim()
+                Genre = StringNormalizer.Normalize(data.Genre) ?? string.Empty
             };
 
             if (!string.IsNullOrWhiteSpace(data.ISBN))
             {
-                if (!Domain.ValueObjects.Isbn.TryParse(data.ISBN, out var vo, out var error))
+                if (!Isbn.TryParse(data.ISBN, out var vo, out var error))
                     throw new DomainException(error ?? "Invalid ISBN");
 
                 book.ISBN = vo!.Value;
@@ -46,12 +48,13 @@ namespace Domain.Models
         public void SetTitle(string title)
         {
             if (string.IsNullOrWhiteSpace(title)) throw new DomainException("Title is required");
-            Title = title.Trim();
+            Title = StringNormalizer.Normalize(title) ?? string.Empty;
         }
 
         public void SetAuthor(string authorId)
         {
-            AuthorId = (authorId ?? string.Empty).Trim();
+            if (string.IsNullOrWhiteSpace(authorId)) throw new DomainException("AuthorId is required");
+            AuthorId = StringNormalizer.Normalize(authorId) ?? string.Empty;
         }
 
         public void SetIsbn(string? isbn)
@@ -62,7 +65,7 @@ namespace Domain.Models
                 return;
             }
 
-            if (!Domain.ValueObjects.Isbn.TryParse(isbn, out var vo, out var error))
+            if (!Isbn.TryParse(isbn, out var vo, out var error))
                 throw new DomainException(error ?? "Invalid ISBN");
 
             ISBN = vo!.Value;
@@ -87,7 +90,7 @@ namespace Domain.Models
         public void SetGenre(string genre)
         {
             if (string.IsNullOrWhiteSpace(genre)) throw new DomainException("Genre is required");
-            Genre = genre.Trim();
+            Genre = StringNormalizer.Normalize(genre) ?? string.Empty;
         }
     }
 }
