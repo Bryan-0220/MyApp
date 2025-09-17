@@ -1,8 +1,9 @@
-using Domain.Models;
-using Domain.Common;
 using Application.Interfaces;
 using Application.Authors.Mappers;
 using FluentValidation;
+using Application.Authors.Services;
+using Domain.Models;
+using Domain.Common;
 
 namespace CreateAuthor
 {
@@ -22,19 +23,9 @@ namespace CreateAuthor
         public async Task<CreateAuthorCommandOutput> Handle(CreateAuthorCommandInput input, CancellationToken ct = default)
         {
             await _validator.ValidateAndThrowAsync(input, ct);
+            await _authorService.EnsureCanCreate(input.Name, ct);
 
-            Author author;
-            try
-            {
-                await _authorService.EnsureCanCreate(input.Name, ct);
-
-                author = Author.Create(input.ToData());
-            }
-            catch (DomainException ex)
-            {
-                throw new InvalidOperationException(ex.Message);
-            }
-
+            var author = Author.Create(input.ToData());
             var created = await _authorRepository.Create(author, ct);
 
             return created.ToOutput();

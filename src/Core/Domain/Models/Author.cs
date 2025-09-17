@@ -19,38 +19,39 @@ namespace Domain.Models
 
         public static Author Create(AuthorData input)
         {
-            if (input == null) throw new DomainException("Input is required");
-            if (string.IsNullOrWhiteSpace(input.Name)) throw new DomainException("Name is required");
-            if (input.BirthDate.HasValue && input.DeathDate.HasValue && input.DeathDate < input.BirthDate) throw new DomainException("DeathDate cannot be before BirthDate");
+            ValidateForCreate(input);
 
-            if (input.Genres == null)
-                throw new DomainException("Genres are required");
+            var author = new Author();
 
-            // Ensure there's at least one non-empty genre before creating the object
-            var hasAnyGenre = input.Genres.Any(g => !string.IsNullOrWhiteSpace(g));
-            if (!hasAnyGenre)
-                throw new DomainException("At least one genre is required");
+            author.SetName(input.Name!);
+            author.SetBio(input.Bio);
+            author.SetNationality(input.Nationality!);
+            author.SetBirthDate(input.BirthDate);
+            author.SetDeathDate(input.DeathDate);
 
-            if (string.IsNullOrWhiteSpace(input.Nationality))
-                throw new DomainException("Nationality is required");
-
-            var a = new Author
-            {
-                Name = StringNormalizer.Normalize(input.Name) ?? string.Empty,
-                Bio = string.IsNullOrWhiteSpace(input.Bio) ? null : StringNormalizer.Normalize(input.Bio),
-                Nationality = StringNormalizer.Normalize(input.Nationality) ?? string.Empty,
-                BirthDate = input.BirthDate,
-                DeathDate = input.DeathDate
-            };
-
-            a.Genres = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            foreach (var g in input.Genres)
+            author.Genres = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var g in input.Genres!)
             {
                 if (string.IsNullOrWhiteSpace(g)) continue;
-                a.Genres.Add(StringNormalizer.Normalize(g)!);
+                author.Genres.Add(StringNormalizer.Normalize(g)!);
             }
 
-            return a;
+            return author;
+        }
+
+        private static void ValidateForCreate(AuthorData? input)
+        {
+            if (input == null) throw new DomainException("Input is required");
+            if (string.IsNullOrWhiteSpace(input.Name)) throw new DomainException("Name is required");
+            if (input.Genres == null) throw new DomainException("Genres are required");
+
+            var hasAnyGenre = input.Genres.Any(g => !string.IsNullOrWhiteSpace(g));
+            if (!hasAnyGenre) throw new DomainException("At least one genre is required");
+
+            if (string.IsNullOrWhiteSpace(input.Nationality)) throw new DomainException("Nationality is required");
+
+            if (input.BirthDate.HasValue && input.DeathDate.HasValue && input.DeathDate < input.BirthDate)
+                throw new DomainException("DeathDate cannot be before BirthDate");
         }
 
         public void SetName(string name)

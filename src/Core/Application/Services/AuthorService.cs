@@ -28,10 +28,9 @@ namespace Application.Authors.Services
 
             var existing = await _authorRepository.Filter(filter, ct);
             if (existing != null && existing.Any())
-            {
                 throw new DomainException("An author with the same name already exists.");
-            }
         }
+
         public async Task EnsureCanDelete(string authorId, CancellationToken ct = default)
         {
             var filter = new BookFilter
