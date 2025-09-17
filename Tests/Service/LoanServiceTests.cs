@@ -14,10 +14,11 @@ namespace Tests
             // Arrange
             var repo = A.Fake<ILoanRepository>();
             var bookService = A.Fake<IBookService>();
+            var readerService = A.Fake<Application.Readers.Services.IReaderService>();
 
             A.CallTo(() => repo.GetById(A<string>._, A<CancellationToken>._)).Returns(Task.FromResult<Loan?>(null));
 
-            var service = new LoanService(repo, bookService);
+            var service = new LoanService(repo, bookService, readerService);
 
             // Act
             var result = await service.DeleteLoan("non-existent-id");
@@ -34,13 +35,15 @@ namespace Tests
             var repo = A.Fake<ILoanRepository>();
             var bookService = A.Fake<IBookService>();
 
+            var readerService = A.Fake<Application.Readers.Services.IReaderService>();
+
             var loan = new Loan { Id = "loan-1", BookId = "book-1", ReaderId = "reader-1", LoanDate = System.DateOnly.FromDateTime(System.DateTime.UtcNow), DueDate = System.DateOnly.FromDateTime(System.DateTime.UtcNow.AddDays(7)), Status = LoanStatus.Returned };
 
             A.CallTo(() => repo.GetById("loan-1", A<CancellationToken>._)).Returns(Task.FromResult<Loan?>(loan));
             A.CallTo(() => repo.Delete("loan-1", A<CancellationToken>._)).Returns(Task.FromResult(true));
             A.CallTo(() => bookService.RestoreCopies(A<string>._, A<CancellationToken>._)).Returns(Task.CompletedTask);
 
-            var service = new LoanService(repo, bookService);
+            var service = new LoanService(repo, bookService, readerService);
 
             // Act
             var result = await service.DeleteLoan("loan-1");

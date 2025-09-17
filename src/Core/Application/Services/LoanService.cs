@@ -13,12 +13,10 @@ namespace Application.Loans.Services
         private readonly ILoanRepository _loanRepository;
         private readonly IBookService _bookService;
         private readonly IReaderService _readerService;
-        private readonly IBookRepository _bookRepository;
 
-        public LoanService(ILoanRepository loanRepository, IBookRepository bookRepository, IBookService bookService, IReaderService readerService)
+        public LoanService(ILoanRepository loanRepository, IBookService bookService, IReaderService readerService)
         {
             _loanRepository = loanRepository;
-            _bookRepository = bookRepository;
             _bookService = bookService;
             _readerService = readerService;
         }
