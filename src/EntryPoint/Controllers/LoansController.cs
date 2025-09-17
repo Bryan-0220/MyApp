@@ -55,7 +55,8 @@ namespace EntryPoint.Controllers
         public async Task<IActionResult> Delete(string id)
         {
             var result = await _deleteLoanHandler.Handle(new DeleteLoanCommandInput { Id = id }, HttpContext.RequestAborted);
-            if (!result.Deleted) return NotFound();
+            if (!result.Success)
+                return NotFound(new { success = result.Success, message = result.Message, loanId = result.LoanId });
             return NoContent();
         }
 
