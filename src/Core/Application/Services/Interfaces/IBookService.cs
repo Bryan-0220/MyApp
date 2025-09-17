@@ -5,7 +5,7 @@ namespace Application.Books.Services
 {
     public interface IBookService
     {
-        Task<Book> EnsureExists(string bookId, CancellationToken ct = default);
+        Task<Book> GetBookOrThrow(string bookId, CancellationToken ct = default);
         Task DecreaseCopiesOrThrow(string bookId, CancellationToken ct = default);
         Task RestoreCopies(string bookId, CancellationToken ct = default);
 

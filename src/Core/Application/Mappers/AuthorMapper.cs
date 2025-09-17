@@ -26,7 +26,7 @@ namespace Application.Authors.Mappers
             };
         }
 
-        public static CreateAuthorCommandOutput ToOutput(this Author author)
+        public static CreateAuthorCommandOutput ToCreateAuthorOutput(this Author author)
         {
             return new CreateAuthorCommandOutput
             {
@@ -41,7 +41,7 @@ namespace Application.Authors.Mappers
         }
 
 
-        public static DeleteAuthorCommandOutput ToDeleteOutput(this Result<Author> result)
+        public static DeleteAuthorCommandOutput ToDeleteAuthorOutput(this Result<Author> result)
         {
             return new DeleteAuthorCommandOutput
             {

@@ -48,7 +48,7 @@ namespace Application.Books.Services
             }
         }
 
-        public async Task<Book> EnsureExists(string bookId, CancellationToken ct = default)
+        public async Task<Book> GetBookOrThrow(string bookId, CancellationToken ct = default)
         {
             var book = await _bookRepository.GetById(bookId, ct);
             if (book == null) throw new DomainException("Book not found.");
