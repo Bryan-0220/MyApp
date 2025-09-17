@@ -39,12 +39,14 @@ namespace Application.Authors.Mappers
             };
         }
 
-        public static DeleteAuthorCommandOutput ToDeleteOutput(this Author? author, bool success, string? message = null)
+
+        public static DeleteAuthorCommandOutput ToDeleteOutput(this Domain.Results.Result<Author> result)
         {
             return new DeleteAuthorCommandOutput
             {
-                Success = success,
-                Message = message
+                Success = result.Success,
+                Message = result.Message,
+                AuthorId = result.Value?.Id
             };
         }
 

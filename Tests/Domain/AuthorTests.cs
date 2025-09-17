@@ -99,11 +99,11 @@ namespace Tests.Domain
         [InlineData("Name", "   ", new string[] { "Fiction" })]
         [InlineData("Name", "Nationality", null)]
         [InlineData("Name", "Nationality", new string[] { })]
-        public void Create_MissingRequiredFields_Throws(string name, string nationality, string[] genres)
+        public void Create_MissingRequiredFields_Throws(string? name, string? nationality, string[]? genres)
         {
             var input = new AuthorData
             {
-                Name = name,
+                Name = name!,
                 Nationality = nationality,
                 Genres = genres
             };
