@@ -7,6 +7,6 @@ namespace Application.Loans.Services
     {
         Task EnsureNoDuplicateLoan(string bookId, string readerId, CancellationToken ct = default);
 
-        Task<Result<Loan>> DeleteLoanById(string id, CancellationToken ct = default);
+        Task<Result<Loan>> DeleteLoan(string id, CancellationToken ct = default);
     }
 }

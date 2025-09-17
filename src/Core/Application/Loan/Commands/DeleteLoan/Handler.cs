@@ -28,7 +28,7 @@ namespace DeleteLoan
         public async Task<DeleteLoanCommandOutput> Handle(DeleteLoanCommandInput input, CancellationToken ct = default)
         {
             await _validator.ValidateAndThrowAsync(input, ct);
-            var result = await _loanService.DeleteLoanById(input.Id, ct);
+            var result = await _loanService.DeleteLoan(input.Id, ct);
             return result.ToDeleteLoanOutput();
         }
 

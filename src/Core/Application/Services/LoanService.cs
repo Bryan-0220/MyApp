@@ -34,30 +34,7 @@ namespace Application.Loans.Services
             }
         }
 
-        //     public async Task<DeleteLoan.DeleteLoanCommandOutput> DeleteLoanById(string loanId, CancellationToken ct = default)
-        //     {
-        //         var loanToDelete = await _loanRepository.GetById(loanId, ct);
-        //         if (loanToDelete is null)
-        //             return (null as Loan).ToDeleteLoanOutput(false, "Loan not found.");
-
-        //         if (!loanToDelete.CanBeDeleted(out var cannotDeleteReason))
-        //             return loanToDelete.ToDeleteLoanOutput(false, cannotDeleteReason);
-
-        //         try
-        //         {
-        //             await _bookService.RestoreCopies(loanToDelete.BookId, ct);
-        //         }
-        //         catch (Exception ex)
-        //         {
-        //             return loanToDelete.ToDeleteLoanOutput(false, ex.Message);
-        //         }
-
-        //         await _loanRepository.Delete(loanId, ct);
-        //         return loanToDelete.ToDeleteLoanOutput(true, "Loan deleted.");
-        //     }
-        // }
-
-        public async Task<Result<Loan>> DeleteLoanById(string loanId, CancellationToken ct = default)
+        public async Task<Result<Loan>> DeleteLoan(string loanId, CancellationToken ct = default)
         {
             var loan = await _loanRepository.GetById(loanId, ct);
             if (loan is null)
