@@ -56,7 +56,7 @@ namespace Application.Loans.Services
 
         public async Task<Loan> CreateLoan(LoanData data, CancellationToken ct = default)
         {
-            var book = await EnsureCreationBusinessRules(data, ct);
+            await EnsureCreationBusinessRules(data, ct);
 
             await _bookService.DecreaseCopiesOrThrow(data.BookId, ct);
             var loan = Loan.Create(data);
@@ -65,13 +65,12 @@ namespace Application.Loans.Services
             return created;
         }
 
-        private async Task<Book> EnsureCreationBusinessRules(LoanData data, CancellationToken ct)
+        private async Task EnsureCreationBusinessRules(LoanData data, CancellationToken ct)
         {
             var book = await _bookService.GetBookOrThrow(data.BookId!, ct);
             await _readerService.EnsureExists(data.ReaderId!, ct);
             await EnsureNoDuplicateLoan(data.BookId!, data.ReaderId!, ct);
             book.EnsureHasAvailableCopies();
-            return book;
         }
 
         private async Task<(bool Success, string Message)> TryRestoreCopies(string bookId, CancellationToken ct)
