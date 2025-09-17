@@ -6,7 +6,7 @@ namespace Tests.Domain
     public class AuthorTests
     {
         [Fact]
-        public void Create_ValidData_ReturnsAuthor()
+        public void Create_ShouldReturnAuthor_WhenValidData()
         {
             var input = new AuthorData
             {
@@ -31,15 +31,13 @@ namespace Tests.Domain
         }
 
         [Fact]
-        public void Create_NullInput_ThrowsDomainException()
+        public void Create_ShouldThrowDomainException_WhenInputIsNull()
         {
             Assert.Throws<DomainException>(() => Author.Create(null!));
         }
 
-
-
         [Fact]
-        public void Create_DeathBeforeBirth_ThrowsDomainException()
+        public void Create_ShouldThrowDomainException_WhenDeathBeforeBirth()
         {
             var input = new AuthorData
             {
@@ -54,7 +52,7 @@ namespace Tests.Domain
         }
 
         [Fact]
-        public void SetBirthAndDeathDate_ValidatesOrder()
+        public void SetBirthAndDeathDates_ShouldValidateOrder_WhenDatesAreSet()
         {
             var input = new AuthorData { Name = "X", Nationality = "Unknown", Genres = new[] { "General" } };
             var a = Author.Create(input);
@@ -69,7 +67,7 @@ namespace Tests.Domain
         }
 
         [Fact]
-        public void SetNameAndBioAndNationality_Work()
+        public void SetNameBioAndNationality_ShouldTrimValues_WhenCalled()
         {
             var a = Author.Create(new AuthorData { Name = "Initial", Nationality = "Unknown", Genres = new[] { "General" } });
             a.SetName(" New Name ");
@@ -83,7 +81,7 @@ namespace Tests.Domain
         }
 
         [Fact]
-        public void AddGenre_DuplicateCaseInsensitive_NoDuplicate()
+        public void AddGenre_ShouldNotAddDuplicate_WhenSameGenreDifferentCase()
         {
             var input = new AuthorData { Name = "G", Nationality = "N", Genres = new[] { "Sci-Fi" } };
             var a = Author.Create(input);
@@ -99,7 +97,7 @@ namespace Tests.Domain
         [InlineData("Name", "   ", new string[] { "Fiction" })]
         [InlineData("Name", "Nationality", null)]
         [InlineData("Name", "Nationality", new string[] { })]
-        public void Create_MissingRequiredFields_Throws(string? name, string? nationality, string[]? genres)
+        public void Create_ShouldThrowDomainException_WhenRequiredFieldsMissing(string? name, string? nationality, string[]? genres)
         {
             var input = new AuthorData
             {

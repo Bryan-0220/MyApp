@@ -9,7 +9,7 @@ namespace Tests
     public class LoanServiceTests
     {
         [Fact]
-        public async Task GivenLoanDoesNotExist_WhenDeleteLoan_ThenReturnsFail()
+        public async Task DeleteLoan_ShouldReturnFail_WhenLoanDoesNotExist()
         {
             // Arrange
             var repo = A.Fake<ILoanRepository>();
@@ -28,7 +28,7 @@ namespace Tests
         }
 
         [Fact]
-        public async Task GivenLoanExists_WhenDeleteLoan_ThenDeletesAndReturnsOk()
+        public async Task DeleteLoan_ShouldDeleteAndReturnOk_WhenLoanExists()
         {
             // Arrange
             var repo = A.Fake<ILoanRepository>();

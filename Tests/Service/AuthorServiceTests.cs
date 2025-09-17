@@ -12,7 +12,7 @@ namespace Tests.Service
     public class AuthorServiceTests
     {
         [Fact]
-        public async Task GivenAuthorDoesNotExist_WhenDeleteAuthor_ThenReturnsFail()
+        public async Task DeleteAuthor_ShouldReturnFail_WhenAuthorDoesNotExist()
         {
             var repo = A.Fake<IAuthorRepository>();
             var bookRepo = A.Fake<IBookRepository>();
@@ -28,7 +28,7 @@ namespace Tests.Service
         }
 
         [Fact]
-        public async Task GivenAuthorExistsAndNoBooks_WhenDeleteAuthor_ThenDeletesAndReturnsOk()
+        public async Task DeleteAuthor_ShouldDeleteAndReturnOk_WhenAuthorExistsAndNoBooks()
         {
             var repo = A.Fake<IAuthorRepository>();
             var bookRepo = A.Fake<IBookRepository>();

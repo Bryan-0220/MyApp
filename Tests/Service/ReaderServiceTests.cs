@@ -8,7 +8,7 @@ namespace Tests
     public class ReaderServiceTests
     {
         [Fact]
-        public async Task GivenReaderDoesNotExist_WhenDeleteReader_ThenReturnsFail()
+        public async Task DeleteReader_ShouldReturnFail_WhenReaderDoesNotExist()
         {
             // Arrange
             var readerRepo = A.Fake<IReaderRepository>();
@@ -27,7 +27,7 @@ namespace Tests
         }
 
         [Fact]
-        public async Task GivenReaderHasActiveLoans_WhenDeleteReader_ThenReturnsFail()
+        public async Task DeleteReader_ShouldReturnFail_WhenReaderHasActiveLoans()
         {
             // Arrange
             var readerRepo = A.Fake<IReaderRepository>();
@@ -52,7 +52,7 @@ namespace Tests
         }
 
         [Fact]
-        public async Task GivenReaderExistsAndNoActiveLoans_WhenDeleteReader_ThenDeletesAndReturnsOk()
+        public async Task DeleteReader_ShouldDeleteAndReturnOk_WhenReaderExistsAndNoActiveLoans()
         {
             // Arrange
             var readerRepo = A.Fake<IReaderRepository>();

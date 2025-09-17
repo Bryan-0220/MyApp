@@ -6,7 +6,7 @@ namespace Tests.Domain
     public class ReaderTests
     {
         [Fact]
-        public void Create_ValidData_ReturnsReader()
+        public void Create_ShouldReturnReader_WhenValidData()
         {
             var data = new ReaderData
             {
@@ -26,7 +26,7 @@ namespace Tests.Domain
         }
 
         [Fact]
-        public void Create_NullInput_ThrowsDomainException()
+        public void Create_ShouldThrowDomainException_WhenInputIsNull()
         {
             Assert.Throws<DomainException>(() => Reader.Create(null!));
         }
@@ -38,7 +38,7 @@ namespace Tests.Domain
         [InlineData("   ", "Last", "a@b.com")]
         [InlineData("First", "   ", "a@b.com")]
         [InlineData("First", "Last", "    ")]
-        public void Create_MissingRequiredFields_Throws(string? first, string? last, string? email)
+        public void Create_ShouldThrowDomainException_WhenRequiredFieldsMissing(string? first, string? last, string? email)
         {
             var data = new ReaderData
             {
@@ -53,7 +53,7 @@ namespace Tests.Domain
         }
 
         [Fact]
-        public void Create_MissingMembershipDate_ThrowsDomainException()
+        public void Create_ShouldThrowDomainException_WhenMembershipDateMissing()
         {
             var data = new ReaderData
             {
@@ -67,7 +67,7 @@ namespace Tests.Domain
         }
 
         [Fact]
-        public void Create_NormalizesStrings()
+        public void Create_ShouldNormalizeStrings_WhenInputHasExtraWhitespace()
         {
             var data = new ReaderData
             {

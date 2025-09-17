@@ -6,7 +6,7 @@ namespace Tests.Domain
     public class BookTests
     {
         [Fact]
-        public void Create_ValidData_ReturnsBook()
+        public void Create_ShouldReturnBook_WhenValidData()
         {
             var data = new BookData
             {
@@ -30,13 +30,13 @@ namespace Tests.Domain
         }
 
         [Fact]
-        public void Create_NullInput_ThrowsDomainException()
+        public void Create_ShouldThrowDomainException_WhenInputIsNull()
         {
             Assert.Throws<DomainException>(() => Book.Create(null!));
         }
 
         [Fact]
-        public void Create_InvalidIsbn_ThrowsDomainException()
+        public void Create_ShouldThrowDomainException_WhenIsbnInvalid()
         {
             var data = new BookData
             {
@@ -59,7 +59,7 @@ namespace Tests.Domain
         [InlineData("Title", "a1", "97801", -1, "Fiction")]
         [InlineData("Title", "a1", "97801", 1, null)]
         [InlineData("Title", "a1", "97801", 1, "   ")]
-        public void Create_MissingOrInvalidFields_Throws(string? title, string? authorId, string? isbn, int copies, string? genre)
+        public void Create_ShouldThrowDomainException_WhenMissingOrInvalidFields(string? title, string? authorId, string? isbn, int copies, string? genre)
         {
             var data = new BookData
             {
@@ -74,7 +74,7 @@ namespace Tests.Domain
         }
 
         [Fact]
-        public void EnsureHasAvailableCopies_WhenZero_ThrowsDomainException()
+        public void EnsureHasAvailableCopies_ShouldThrowDomainException_WhenZeroCopies()
         {
             var data = new BookData
             {
@@ -91,7 +91,7 @@ namespace Tests.Domain
 
 
         [Fact]
-        public void SetCopiesAvailable_Negative_Throws()
+        public void SetCopiesAvailable_ShouldThrowDomainException_WhenNegative()
         {
             var data = new BookData { Title = "T", AuthorId = "A", CopiesAvailable = 1, Genre = "G" };
             var b = Book.Create(data);
@@ -99,14 +99,12 @@ namespace Tests.Domain
         }
 
         [Fact]
-        public void SetGenre_NormalizesString()
+        public void SetGenre_ShouldNormalizeString_WhenWhitespacePresent()
         {
             var data = new BookData { Title = "T", AuthorId = "A", CopiesAvailable = 1, Genre = "G" };
             var b = Book.Create(data);
             b.SetGenre("  Science   Fiction  ");
             Assert.Contains("Science Fiction", b.Genre);
         }
-
     }
-
 }

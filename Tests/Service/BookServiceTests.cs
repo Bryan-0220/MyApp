@@ -8,7 +8,7 @@ namespace Tests
     public class BookServiceTests
     {
         [Fact]
-        public async Task GivenBookDoesNotExist_WhenDeleteBook_ThenReturnsFail()
+        public async Task DeleteBook_ShouldReturnFail_WhenBookDoesNotExist()
         {
             // Arrange
             var repo = A.Fake<IBookRepository>();
@@ -27,7 +27,7 @@ namespace Tests
         }
 
         [Fact]
-        public async Task GivenBookHasActiveLoans_WhenDeleteBook_ThenReturnsFail()
+        public async Task DeleteBook_ShouldReturnFail_WhenBookHasActiveLoans()
         {
             // Arrange
             var repo = A.Fake<IBookRepository>();
@@ -52,7 +52,7 @@ namespace Tests
         }
 
         [Fact]
-        public async Task GivenBookExistsAndNoActiveLoans_WhenDeleteBook_ThenDeletesAndReturnsOk()
+        public async Task DeleteBook_ShouldDeleteAndReturnOk_WhenBookExistsAndNoActiveLoans()
         {
             // Arrange
             var repo = A.Fake<IBookRepository>();

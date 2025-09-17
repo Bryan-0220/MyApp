@@ -8,14 +8,13 @@ namespace Tests.Domain
     public class LoanTests
     {
         [Fact]
-        public void Create_ShouldThrow_WhenInputIsNull()
+        public void Create_ShouldThrowDomainException_WhenInputIsNull()
         {
             Assert.Throws<DomainException>(() => Loan.Create(null!));
         }
 
-
         [Fact]
-        public void Create_ShouldTrimIds_AndSetDefaults()
+        public void Create_ShouldTrimIdsAndSetDefaults_WhenIdsHaveWhitespace()
         {
             var data = new LoanData
             {
@@ -37,7 +36,7 @@ namespace Tests.Domain
         // consolidated required-field tests above
 
         [Fact]
-        public void Create_Allows_DueDate_EqualTo_LoanDate()
+        public void Create_ShouldAllowEqualLoanAndDueDate_AndSetStatusActive()
         {
             var today = DateOnly.FromDateTime(DateTime.UtcNow);
             var data = new LoanData
@@ -60,7 +59,7 @@ namespace Tests.Domain
         [InlineData(-1, "book-1", "reader-1")]
         [InlineData(0, "    ", "  reader-1  ")]
         [InlineData(1, "book-1", "   ")]
-        public void Create_DueDateRelativeToLoanDate_ValidatesProperly(int dueOffsetDays, string bookId, string readerId)
+        public void Create_ShouldThrowDomainException_WhenDueDateInvalidOrIdsMissing(int dueOffsetDays, string bookId, string readerId)
         {
             var loanDate = DateOnly.FromDateTime(DateTime.UtcNow);
             var data = new LoanData
