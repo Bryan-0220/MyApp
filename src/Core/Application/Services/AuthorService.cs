@@ -45,6 +45,15 @@ namespace Application.Authors.Services
             }
         }
 
+        public async Task<Author> CreateAuthor(AuthorData input, CancellationToken ct)
+        {
+            await EnsureCanCreate(input.Name, ct);
+
+            var author = Author.Create(input);
+            var created = await _authorRepository.Create(author, ct);
+            return created;
+        }
+
         public async Task<Result<Author>> DeleteAuthor(string authorId, CancellationToken ct = default)
         {
             var existing = await _authorRepository.GetById(authorId, ct);

@@ -23,12 +23,9 @@ namespace CreateAuthor
         public async Task<CreateAuthorCommandOutput> Handle(CreateAuthorCommandInput input, CancellationToken ct = default)
         {
             await _validator.ValidateAndThrowAsync(input, ct);
-            await _authorService.EnsureCanCreate(input.Name, ct);
-
-            var author = Author.Create(input.ToData());
-            var created = await _authorRepository.Create(author, ct);
-
+            var created = await _authorService.CreateAuthor(input.ToData(), ct);
             return created.ToCreateAuthorOutput();
         }
+
     }
 }
