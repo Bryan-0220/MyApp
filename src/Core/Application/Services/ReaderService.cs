@@ -62,8 +62,21 @@ namespace Application.Readers.Services
             }
         }
 
+        public async Task<Reader> CreateReader(ReaderData input, CancellationToken ct = default)
+        {
+            await EnsureEmailNotInUse(input.Email!, ct);
+            var reader = Reader.Create(input);
+            var created = await _readerRepository.Create(reader, ct);
+            return created;
+        }
 
-
+        public async Task EnsureEmailNotInUse(string email, CancellationToken ct = default)
+        {
+            var filter = new ReaderFilter { Email = email };
+            var results = await _readerRepository.Filter(filter, ct);
+            if (results != null && results.Any())
+                throw new DomainException("Email is already registered for another reader.");
+        }
 
         public async Task EnsureCanDelete(string readerId, CancellationToken ct = default)
         {
