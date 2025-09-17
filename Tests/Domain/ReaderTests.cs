@@ -38,13 +38,13 @@ namespace Tests.Domain
         [InlineData("   ", "Last", "a@b.com")]
         [InlineData("First", "   ", "a@b.com")]
         [InlineData("First", "Last", "    ")]
-        public void Create_MissingRequiredFields_Throws(string first, string last, string email)
+        public void Create_MissingRequiredFields_Throws(string? first, string? last, string? email)
         {
             var data = new ReaderData
             {
-                FirstName = first,
-                LastName = last,
-                Email = email
+                FirstName = first!,
+                LastName = last!,
+                Email = email!
             };
 
             data.MembershipDate = new DateOnly(2020, 1, 1);

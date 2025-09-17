@@ -1,8 +1,8 @@
+using Application.Books.Services;
 using Application.Filters;
 using Application.Interfaces;
 using Domain.Common;
 using Domain.Models;
-using Application.Books.Services;
 using Domain.Results;
 
 namespace Application.Loans.Services

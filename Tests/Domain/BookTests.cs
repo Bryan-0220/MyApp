@@ -59,15 +59,15 @@ namespace Tests.Domain
         [InlineData("Title", "a1", "97801", -1, "Fiction")]
         [InlineData("Title", "a1", "97801", 1, null)]
         [InlineData("Title", "a1", "97801", 1, "   ")]
-        public void Create_MissingOrInvalidFields_Throws(string title, string authorId, string isbn, int copies, string genre)
+        public void Create_MissingOrInvalidFields_Throws(string? title, string? authorId, string? isbn, int copies, string? genre)
         {
             var data = new BookData
             {
-                Title = title,
-                AuthorId = authorId,
+                Title = title!,
+                AuthorId = authorId!,
                 ISBN = isbn,
                 CopiesAvailable = copies,
-                Genre = genre
+                Genre = genre!
             };
 
             Assert.Throws<DomainException>(() => Book.Create(data));
