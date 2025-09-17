@@ -19,30 +19,27 @@ namespace Domain.Models
 
         public static Book Create(BookData data)
         {
+            ValidateForCreate(data);
+
+            var book = new Book();
+
+            book.SetTitle(data.Title!);
+            book.SetAuthor(data.AuthorId!);
+            book.SetPublishedYear(data.PublishedYear);
+            book.SetCopiesAvailable(data.CopiesAvailable);
+            book.SetGenre(data.Genre!);
+            book.SetIsbn(data.ISBN);
+
+            return book;
+        }
+
+        private static void ValidateForCreate(BookData? data)
+        {
             if (data == null) throw new DomainException("Input is required");
             if (string.IsNullOrWhiteSpace(data.Title)) throw new DomainException("Title is required");
             if (data.CopiesAvailable < 0) throw new DomainException("CopiesAvailable must be >= 0");
             if (string.IsNullOrWhiteSpace(data.AuthorId)) throw new DomainException("AuthorId is required");
             if (string.IsNullOrWhiteSpace(data.Genre)) throw new DomainException("Genre is required");
-
-            var book = new Book
-            {
-                Title = StringNormalizer.Normalize(data.Title) ?? string.Empty,
-                AuthorId = StringNormalizer.Normalize(data.AuthorId) ?? string.Empty,
-                PublishedYear = data.PublishedYear,
-                CopiesAvailable = data.CopiesAvailable,
-                Genre = StringNormalizer.Normalize(data.Genre) ?? string.Empty
-            };
-
-            if (!string.IsNullOrWhiteSpace(data.ISBN))
-            {
-                if (!Isbn.TryParse(data.ISBN, out var vo, out var error))
-                    throw new DomainException(error ?? "Invalid ISBN");
-
-                book.ISBN = vo!.Value;
-            }
-
-            return book;
         }
 
         public void SetTitle(string title)
