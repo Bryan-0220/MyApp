@@ -1,4 +1,5 @@
 using Domain.Models;
+using Domain.Results;
 using GetAllBooks;
 using FilterBooks;
 using CreateBook;
@@ -78,12 +79,13 @@ namespace Application.Books.Mappers
             };
         }
 
-        public static DeleteBookCommandOutput ToDeleteBookOutput(this Book? book, bool success, string? message = null)
+        public static DeleteBookCommandOutput ToDeleteBookOutput(this Result<Book> result)
         {
             return new DeleteBookCommandOutput
             {
-                Success = success,
-                Message = message
+                Success = result.Success,
+                Message = result.Message,
+                BookId = result.Value?.Id
             };
         }
     }

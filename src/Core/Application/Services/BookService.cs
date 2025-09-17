@@ -1,4 +1,6 @@
 using Application.Interfaces;
+using Application.Filters;
+using Domain.Results;
 using Domain.Common;
 using Domain.Models;
 
@@ -13,6 +15,37 @@ namespace Application.Books.Services
         {
             _bookRepository = bookRepository;
             _loanRepository = loanRepository;
+        }
+
+        public async Task<Result<Book>> DeleteBook(string bookId, CancellationToken ct = default)
+        {
+            var book = await _bookRepository.GetById(bookId, ct);
+            if (book is null)
+                return Result<Book>.Fail("Book not found.");
+
+            var ensureResult = await TryEnsureCanDelete(bookId, ct);
+            if (!ensureResult.Success)
+                return Result<Book>.Fail(ensureResult.Message);
+
+            await _bookRepository.Delete(bookId, ct);
+            return Result<Book>.Ok(book, "Book deleted.");
+        }
+
+        private async Task<(bool Success, string Message)> TryEnsureCanDelete(string bookId, CancellationToken ct)
+        {
+            try
+            {
+                await EnsureCanDelete(bookId, ct);
+                return (true, string.Empty);
+            }
+            catch (DomainException ex)
+            {
+                return (false, ex.Message);
+            }
+            catch (Exception)
+            {
+                return (false, "Unexpected error validating book deletion.");
+            }
         }
 
         public async Task<Book> EnsureExists(string bookId, CancellationToken ct = default)
@@ -40,7 +73,7 @@ namespace Application.Books.Services
 
         public async Task EnsureCanDelete(string bookId, CancellationToken ct = default)
         {
-            var filter = new Application.Filters.LoanFilter
+            var filter = new LoanFilter
             {
                 BookId = bookId,
                 Returned = false

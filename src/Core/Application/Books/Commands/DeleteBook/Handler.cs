@@ -22,24 +22,8 @@ namespace DeleteBook
         public async Task<DeleteBookCommandOutput> Handle(DeleteBookCommandInput input, CancellationToken ct = default)
         {
             await _validator.ValidateAndThrowAsync(input, ct);
-
-            var existing = await _bookRepository.GetById(input.Id, ct);
-            if (existing is null)
-            {
-                return (null as Domain.Models.Book).ToDeleteBookOutput(false, "Book not found");
-            }
-
-            try
-            {
-                await _bookService.EnsureCanDelete(input.Id, ct);
-            }
-            catch (DomainException dex)
-            {
-                return existing.ToDeleteBookOutput(false, dex.Message);
-            }
-
-            await _bookRepository.Delete(input.Id, ct);
-            return existing.ToDeleteBookOutput(true, "Book deleted");
+            var result = await _bookService.DeleteBook(input.Id, ct);
+            return result.ToDeleteBookOutput();
         }
     }
 }
