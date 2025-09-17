@@ -1,7 +1,6 @@
 using Application.Books.Services;
 using Application.Interfaces;
 using Domain.Models;
-using Domain.Common;
 using FakeItEasy;
 
 namespace Tests

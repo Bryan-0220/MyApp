@@ -1,4 +1,5 @@
 using Domain.Models;
+using Domain.Results;
 using CreateAuthor;
 using DeleteAuthor;
 using GetAllAuthors;
@@ -40,7 +41,7 @@ namespace Application.Authors.Mappers
         }
 
 
-        public static DeleteAuthorCommandOutput ToDeleteOutput(this Domain.Results.Result<Author> result)
+        public static DeleteAuthorCommandOutput ToDeleteOutput(this Result<Author> result)
         {
             return new DeleteAuthorCommandOutput
             {
