@@ -21,17 +21,8 @@ namespace DeleteReader
         public async Task<DeleteReaderCommandOutput> Handle(DeleteReaderCommandInput input, CancellationToken ct = default)
         {
             await _validator.ValidateAndThrowAsync(input, ct);
-
-            var existing = await _readerRepository.GetById(input.Id, ct);
-            if (existing is null)
-            {
-                return (null as Domain.Models.Reader).ToDeleteReaderOutput(false, "Reader not found");
-            }
-
-            await _readerService.EnsureCanDelete(existing.Id, ct);
-
-            await _readerRepository.Delete(input.Id, ct);
-            return existing.ToDeleteReaderOutput(true, "Reader deleted");
+            var result = await _readerService.DeleteReader(input.Id, ct);
+            return result.ToDeleteReaderOutput();
         }
     }
 }

@@ -1,11 +1,12 @@
-using System.Threading;
-using System.Threading.Tasks;
+using Domain.Models;
+using Domain.Results;
 
 namespace Application.Readers.Services
 {
     public interface IReaderService
     {
-        Task<Domain.Models.Reader> EnsureExists(string readerId, CancellationToken ct = default);
+        Task<Reader> EnsureExists(string readerId, CancellationToken ct = default);
         Task EnsureCanDelete(string readerId, CancellationToken ct = default);
+        Task<Result<Reader>> DeleteReader(string readerId, CancellationToken ct = default);
     }
 }

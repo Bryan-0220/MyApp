@@ -5,6 +5,7 @@ using FilterReaders;
 using CreateReader;
 using UpdateReader;
 using DeleteReader;
+using Domain.Results;
 
 namespace Application.Readers.Mappers
 {
@@ -22,7 +23,6 @@ namespace Application.Readers.Mappers
                 MembershipDate = input.MembershipDate
             };
         }
-
 
         public static GetAllReadersQueryOutput ToGetAllReadersOutput(this Reader reader)
         {
@@ -84,12 +84,13 @@ namespace Application.Readers.Mappers
             };
         }
 
-        public static DeleteReaderCommandOutput ToDeleteReaderOutput(this Reader? reader, bool success, string? message = null)
+        public static DeleteReaderCommandOutput ToDeleteReaderOutput(this Result<Reader> result)
         {
             return new DeleteReaderCommandOutput
             {
-                Success = success,
-                Message = message
+                Success = result.Success,
+                Message = result.Message,
+                ReaderId = result.Value?.Id
             };
         }
     }

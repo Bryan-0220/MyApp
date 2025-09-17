@@ -55,7 +55,7 @@ namespace EntryPoint.Controllers
         public async Task<IActionResult> Delete(string id)
         {
             var result = await _deleteReaderHandler.Handle(new DeleteReaderCommandInput { Id = id }, HttpContext.RequestAborted);
-            if (!result.Success) return NotFound();
+            if (!result.Success) return NotFound(new { success = result.Success, message = result.Message, readerId = result.ReaderId });
             return NoContent();
         }
 
