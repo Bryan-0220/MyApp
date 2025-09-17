@@ -11,7 +11,7 @@ namespace CreateAuthor
     {
         private readonly IAuthorRepository _authorRepository;
         private readonly IValidator<CreateAuthorCommandInput> _validator;
-        private readonly Application.Authors.Services.IAuthorService _authorService;
+        private readonly IAuthorService _authorService;
 
         public CreateAuthorCommandHandler(IAuthorRepository authorRepository, IValidator<CreateAuthorCommandInput> validator, Application.Authors.Services.IAuthorService authorService)
         {
@@ -28,7 +28,7 @@ namespace CreateAuthor
             var author = Author.Create(input.ToData());
             var created = await _authorRepository.Create(author, ct);
 
-            return created.ToOutput();
+            return created.ToCreateAuthorOutput();
         }
     }
 }

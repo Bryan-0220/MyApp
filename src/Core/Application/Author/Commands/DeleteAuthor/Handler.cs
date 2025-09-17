@@ -23,7 +23,7 @@ namespace DeleteAuthor
         {
             await _validator.ValidateAndThrowAsync(input, ct);
             var result = await _deletionService.DeleteAuthor(input.Id, ct);
-            return result.ToDeleteOutput();
+            return result.ToDeleteAuthorOutput();
         }
     }
 }
