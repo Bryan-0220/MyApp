@@ -22,9 +22,7 @@ namespace CreateReader
         public async Task<CreateReaderCommandOutput> Handle(CreateReaderCommandInput input, CancellationToken ct = default)
         {
             await _validator.ValidateAndThrowAsync(input, ct);
-
             var created = await _readerService.CreateReader(input.ToData(), ct);
-
             return created.ToCreateReaderOutput();
         }
 
