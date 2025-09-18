@@ -19,18 +19,9 @@ namespace FilterAuthors
         public async Task<IEnumerable<FilterAuthorsQueryOutput>> Handle(FilterAuthorsQueryInput input, CancellationToken ct = default)
         {
             await _validator.ValidateAndThrowAsync(input, ct);
-
-            var cleanedGenres = input.Genres?.Where(g => !string.IsNullOrWhiteSpace(g)).Select(g => g.Trim()).ToArray();
-
-            var filter = new AuthorFilter
-            {
-                Name = input.Name?.Trim(),
-                Genres = cleanedGenres != null && cleanedGenres.Length > 0 ? cleanedGenres : null
-            };
-
+            var filter = AuthorFilter.Create(input.Name, input.Genres);
             var authors = await _authorRepository.Filter(filter, ct);
-
-            return authors.Select(a => a.ToFilterAuthorsOutput());
+            return authors.Select(author => author.ToFilterAuthorsOutput());
         }
     }
 }

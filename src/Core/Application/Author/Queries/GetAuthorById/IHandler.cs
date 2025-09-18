@@ -1,7 +1,9 @@
+using Domain.Results;
+
 namespace GetAuthorById
 {
     public interface IGetAuthorByIdQueryHandler
     {
-        Task<GetAuthorByIdQueryOutput?> Handle(GetAuthorByIdQueryInput query, CancellationToken ct = default);
+        Task<Result<GetAuthorByIdQueryOutput>> Handle(GetAuthorByIdQueryInput query, CancellationToken ct = default);
     }
 }
