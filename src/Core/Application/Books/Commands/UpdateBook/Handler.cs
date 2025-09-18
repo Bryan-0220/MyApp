@@ -1,61 +1,25 @@
-using Application.Interfaces;
-using Domain.Models;
-using FluentValidation;
 using Application.Books.Mappers;
+using Application.Books.Services;
+using FluentValidation;
 
 namespace UpdateBook
 {
     public class UpdateBookCommandHandler : IUpdateBookCommandHandler
     {
-        private readonly IBookRepository _bookRepository;
+        private readonly IBookService _bookService;
         private readonly IValidator<UpdateBookCommandInput> _validator;
 
-        public UpdateBookCommandHandler(IBookRepository bookRepository, IValidator<UpdateBookCommandInput> validator)
+        public UpdateBookCommandHandler(IBookService bookService, IValidator<UpdateBookCommandInput> validator)
         {
-            _bookRepository = bookRepository;
+            _bookService = bookService;
             _validator = validator;
         }
 
-        public async Task<UpdateBookCommandOutput?> Handle(UpdateBookCommandInput input, CancellationToken ct = default)
+        public async Task<UpdateBookCommandOutput> Handle(UpdateBookCommandInput input, CancellationToken ct = default)
         {
             await _validator.ValidateAndThrowAsync(input, ct);
-
-            var bookToUpdate = await _bookRepository.GetById(input.Id, ct);
-            if (bookToUpdate is null) return null;
-
-            try
-            {
-                applyAttributes(input, bookToUpdate);
-            }
-            catch (Domain.Common.DomainException ex)
-            {
-                throw new InvalidOperationException(ex.Message);
-            }
-
-            await _bookRepository.Update(bookToUpdate, ct);
-
-            return bookToUpdate.ToUpdateBookOutput();
-        }
-
-        private static void applyAttributes(UpdateBookCommandInput input, Book existing)
-        {
-            if (!string.IsNullOrWhiteSpace(input.Title) && input.Title != "string")
-                existing.SetTitle(input.Title!.Trim());
-
-            if (!string.IsNullOrWhiteSpace(input.AuthorId) && input.AuthorId != "string")
-                existing.SetAuthor(input.AuthorId!.Trim());
-
-            if (!string.IsNullOrWhiteSpace(input.ISBN) && input.ISBN != "string")
-                existing.SetIsbn(input.ISBN!.Trim());
-
-            if (input.PublishedYear.HasValue && input.PublishedYear.Value != -1)
-                existing.SetPublishedYear(input.PublishedYear);
-
-            if (input.CopiesAvailable.HasValue && input.CopiesAvailable.Value != -1)
-                existing.SetCopiesAvailable(input.CopiesAvailable.Value);
-
-            if (!string.IsNullOrWhiteSpace(input.Genre) && input.Genre != "string")
-                existing.SetGenre(input.Genre!.Trim());
+            var updated = await _bookService.UpdateBook(input, ct);
+            return updated.ToUpdateBookOutput();
         }
     }
 }

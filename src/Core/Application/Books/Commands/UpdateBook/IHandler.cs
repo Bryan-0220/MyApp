@@ -2,6 +2,6 @@ namespace UpdateBook
 {
     public interface IUpdateBookCommandHandler
     {
-        Task<UpdateBookCommandOutput?> Handle(UpdateBookCommandInput input, CancellationToken ct = default);
+        Task<UpdateBookCommandOutput> Handle(UpdateBookCommandInput input, CancellationToken ct = default);
     }
 }

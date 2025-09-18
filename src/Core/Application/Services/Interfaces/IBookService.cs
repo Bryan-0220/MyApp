@@ -1,5 +1,6 @@
 using Domain.Models;
 using Domain.Results;
+using UpdateBook;
 
 namespace Application.Books.Services
 {
@@ -11,5 +12,6 @@ namespace Application.Books.Services
 
         Task EnsureCanDelete(string bookId, CancellationToken ct = default);
         Task<Result<Book>> DeleteBook(string bookId, CancellationToken ct = default);
+        Task<Book> UpdateBook(UpdateBookCommandInput input, CancellationToken ct = default);
     }
 }
