@@ -3,6 +3,7 @@ using Application.Interfaces;
 using Domain.Common;
 using Domain.Models;
 using Domain.Results;
+using UpdateAuthor;
 
 namespace Application.Authors.Services
 {
@@ -54,11 +55,44 @@ namespace Application.Authors.Services
             return created;
         }
 
+        public async Task<Author> UpdateAuthor(UpdateAuthorCommandInput input, CancellationToken ct = default)
+        {
+            var existing = await _authorRepository.GetById(input.Id, ct);
+            if (existing is null)
+                throw new DomainException("Author not found");
+
+            applyAttributes(input, existing);
+
+            await _authorRepository.Update(existing, ct);
+            return existing;
+        }
+
+        private static void applyAttributes(UpdateAuthorCommandInput input, Author existing)
+        {
+            if (!string.IsNullOrWhiteSpace(input.Name) && input.Name != "string")
+                existing.SetName(input.Name!.Trim());
+
+            if (!string.IsNullOrWhiteSpace(input.Bio) && input.Bio != "string")
+                existing.SetBio(input.Bio!.Trim());
+
+            if (!string.IsNullOrWhiteSpace(input.Nationality) && input.Nationality != "string")
+                existing.SetNationality(input.Nationality!.Trim());
+
+            if (input.BirthDate.HasValue)
+                existing.SetBirthDate(input.BirthDate);
+
+            if (input.DeathDate.HasValue)
+                existing.SetDeathDate(input.DeathDate);
+
+            if (input.Genres != null)
+                existing.SetGenres(input.Genres);
+        }
+
         public async Task<Result<Author>> DeleteAuthor(string authorId, CancellationToken ct = default)
         {
             var existing = await _authorRepository.GetById(authorId, ct);
             if (existing is null)
-                return Domain.Results.Result<Domain.Models.Author>.Fail("Author not found");
+                return Domain.Results.Result<Author>.Fail("Author not found");
 
             try
             {
@@ -66,11 +100,11 @@ namespace Application.Authors.Services
             }
             catch (DomainException dex)
             {
-                return Domain.Results.Result<Domain.Models.Author>.Fail(dex.Message);
+                return Domain.Results.Result<Author>.Fail(dex.Message);
             }
 
             await _authorRepository.Delete(authorId, ct);
-            return Domain.Results.Result<Domain.Models.Author>.Ok(existing, "Author deleted");
+            return Domain.Results.Result<Author>.Ok(existing, "Author deleted");
         }
     }
 }
