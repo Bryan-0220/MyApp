@@ -14,11 +14,8 @@ namespace GetAllReaders
 
         public async Task<IEnumerable<GetAllReadersQueryOutput>> Handle(GetAllReadersQueryInput query, CancellationToken ct = default)
         {
-            var users = await _readerRepository.GetAll(ct);
-
-            var projected = users.Select(r => r.ToGetAllReadersOutput());
-
-            return projected;
+            var readers = await _readerRepository.GetAll(ct);
+            return readers.Select(reader => reader.ToGetAllReadersOutput());
         }
     }
 }

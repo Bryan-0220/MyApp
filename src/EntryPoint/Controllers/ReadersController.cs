@@ -77,9 +77,9 @@ namespace EntryPoint.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(string id)
         {
-            var reader = await _getReaderByIdQueryHandler.Handle(new GetReaderByIdQueryInput { Id = id }, HttpContext.RequestAborted);
-            if (reader == null) return NotFound();
-            return Ok(reader);
+            var result = await _getReaderByIdQueryHandler.Handle(new GetReaderByIdQueryInput { Id = id }, HttpContext.RequestAborted);
+            if (!result.Success) return NotFound(new { success = result.Success, message = result.Message });
+            return Ok(result.Value);
         }
     }
 }

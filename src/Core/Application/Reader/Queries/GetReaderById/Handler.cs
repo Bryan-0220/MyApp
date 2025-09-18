@@ -1,4 +1,5 @@
 using Application.Interfaces;
+using Domain.Results;
 using Application.Readers.Mappers;
 
 namespace GetReaderById
@@ -12,12 +13,11 @@ namespace GetReaderById
             _readerRepository = readerRepository;
         }
 
-        public async Task<GetReaderByIdQueryOutput?> Handle(GetReaderByIdQueryInput query, CancellationToken ct = default)
+        public async Task<Result<GetReaderByIdQueryOutput>> Handle(GetReaderByIdQueryInput query, CancellationToken ct = default)
         {
-            var user = await _readerRepository.GetById(query.Id, ct);
-            if (user is null) return null;
-
-            return user.ToGetReaderByIdOutput();
+            var reader = await _readerRepository.GetById(query.Id, ct);
+            if (reader is null) return Result<GetReaderByIdQueryOutput>.Fail("Reader not found");
+            return Result<GetReaderByIdQueryOutput>.Ok(reader.ToGetReaderByIdOutput());
         }
     }
 }
