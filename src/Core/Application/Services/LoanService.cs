@@ -5,6 +5,7 @@ using Application.Interfaces;
 using Domain.Common;
 using Domain.Models;
 using Domain.Results;
+using UpdateLoan;
 
 namespace Application.Loans.Services
 {
@@ -44,7 +45,7 @@ namespace Application.Loans.Services
             if (!loan.CanBeDeleted(out var reason))
                 return Result<Loan>.Fail(reason ?? "Loan cannot be deleted for an unspecified reason.");
 
-            var restoreResult = await TryRestoreCopies(loan.BookId, ct);
+            var restoreResult = await tryRestoreCopies(loan.BookId, ct);
             if (!restoreResult.Success)
                 return Result<Loan>.Fail(restoreResult.Message);
 
@@ -71,7 +72,7 @@ namespace Application.Loans.Services
             book.EnsureHasAvailableCopies();
         }
 
-        private async Task<(bool Success, string Message)> TryRestoreCopies(string bookId, CancellationToken ct)
+        private async Task<(bool Success, string Message)> tryRestoreCopies(string bookId, CancellationToken ct)
         {
             try
             {
@@ -85,6 +86,41 @@ namespace Application.Loans.Services
             catch (Exception)
             {
                 return (false, "Unexpected error restoring book copies.");
+            }
+        }
+
+        public async Task<Loan> UpdateLoan(UpdateLoanCommandInput input, CancellationToken ct = default)
+        {
+            var existing = await _loanRepository.GetById(input.Id, ct);
+            if (existing is null) throw new DomainException("Loan not found");
+
+            ApplyUpdates(input, existing);
+
+            await _loanRepository.Update(existing, ct);
+            return existing;
+        }
+
+        private static void ApplyUpdates(UpdateLoanCommandInput input, Loan existing)
+        {
+            if (!string.IsNullOrWhiteSpace(input.BookId))
+                existing.BookId = input.BookId!.Trim();
+
+            if (!string.IsNullOrWhiteSpace(input.ReaderId))
+                existing.ReaderId = input.ReaderId!.Trim();
+
+            if (input.LoanDate.HasValue)
+                existing.LoanDate = input.LoanDate.Value;
+
+            if (input.DueDate.HasValue)
+                existing.DueDate = input.DueDate.Value;
+
+            if (input.ReturnedDate.HasValue)
+                existing.ReturnedDate = input.ReturnedDate.Value;
+
+            if (!string.IsNullOrWhiteSpace(input.Status))
+            {
+                if (Enum.TryParse<LoanStatus>(input.Status, true, out var st))
+                    existing.Status = st;
             }
         }
     }
