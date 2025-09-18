@@ -1,7 +1,9 @@
+using Domain.Results;
+
 namespace GetLoanById
 {
     public interface IGetLoanByIdQueryHandler
     {
-        Task<GetLoanByIdQueryOutput?> Handle(GetLoanByIdQueryInput query, CancellationToken ct);
+        Task<Result<GetLoanByIdQueryOutput>> Handle(GetLoanByIdQueryInput query, CancellationToken ct);
     }
 }

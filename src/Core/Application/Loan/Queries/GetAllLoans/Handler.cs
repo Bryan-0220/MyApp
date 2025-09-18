@@ -15,8 +15,7 @@ namespace GetAllLoans
         public async Task<IEnumerable<GetAllLoansQueryOutput>> Handle(GetAllLoansQueryInput query, CancellationToken ct = default)
         {
             var loans = await _loanRepository.GetAll(ct);
-
-            return loans.Select(b => b.ToGetAllLoansOutput());
+            return loans.Select(loan => loan.ToGetAllLoansOutput());
         }
     }
 }

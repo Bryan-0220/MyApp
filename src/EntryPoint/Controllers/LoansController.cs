@@ -78,9 +78,9 @@ namespace EntryPoint.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(string id)
         {
-            var loan = await _getLoanByIdQueryHandler.Handle(new GetLoanByIdQueryInput { Id = id }, HttpContext.RequestAborted);
-            if (loan == null) return NotFound();
-            return Ok(loan);
+            var result = await _getLoanByIdQueryHandler.Handle(new GetLoanByIdQueryInput { Id = id }, HttpContext.RequestAborted);
+            if (!result.Success) return NotFound(new { success = result.Success, message = result.Message });
+            return Ok(result.Value);
         }
     }
 }

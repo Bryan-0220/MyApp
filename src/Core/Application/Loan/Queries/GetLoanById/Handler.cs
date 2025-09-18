@@ -1,4 +1,5 @@
 using Application.Interfaces;
+using Domain.Results;
 using Application.Loans.Mappers;
 
 namespace GetLoanById
@@ -12,12 +13,11 @@ namespace GetLoanById
             _loanRepository = loanRepository;
         }
 
-        public async Task<GetLoanByIdQueryOutput?> Handle(GetLoanByIdQueryInput query, CancellationToken ct = default)
+        public async Task<Result<GetLoanByIdQueryOutput>> Handle(GetLoanByIdQueryInput query, CancellationToken ct = default)
         {
             var loan = await _loanRepository.GetById(query.Id, ct);
-            if (loan is null) return null;
-
-            return loan.ToGetLoanByIdOutput();
+            if (loan is null) return Result<GetLoanByIdQueryOutput>.Fail("Loan not found");
+            return Result<GetLoanByIdQueryOutput>.Ok(loan.ToGetLoanByIdOutput());
         }
     }
 }

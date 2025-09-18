@@ -19,20 +19,8 @@ namespace FilterLoans
         public async Task<IEnumerable<FilterLoansQueryOutput>> Handle(FilterLoansQueryInput input, CancellationToken ct = default)
         {
             await _validator.ValidateAndThrowAsync(input, ct);
-
-
-            var filter = new LoanFilter
-            {
-                UserId = string.IsNullOrWhiteSpace(input.ReaderId) ? null : input.ReaderId,
-                BookId = string.IsNullOrWhiteSpace(input.BookId) ? null : input.BookId,
-                LoanDate = input.LoanDate,
-                DueDate = input.DueDate,
-                ReturnedDate = input.ReturnedDate,
-                Returned = string.IsNullOrWhiteSpace(input.Status) ? null : (input.Status == "Returned" ? true : input.Status == "Active" ? false : (bool?)null)
-            };
-
+            var filter = LoanFilter.Create(loanDate: input.LoanDate, dueDate: input.DueDate);
             var loans = await _loanRepository.Filter(filter, ct);
-
             return loans.Select(loan => loan.ToFilterLoansOutput());
         }
     }
