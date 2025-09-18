@@ -15,8 +15,7 @@ namespace GetAllBooks
         public async Task<IEnumerable<GetAllBooksQueryOutput>> Handle(GetAllBooksQueryInput query, CancellationToken ct = default)
         {
             var books = await _bookRepository.GetAll(ct);
-
-            return books.Select(b => b.ToGetAllBooksOutput());
+            return books.Select(book => book.ToGetAllBooksOutput());
         }
     }
 }

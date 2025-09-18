@@ -1,6 +1,7 @@
 using Domain.Models;
 using Domain.Results;
 using GetAllBooks;
+using GetBookById;
 using FilterBooks;
 using CreateBook;
 using UpdateBook;
@@ -76,6 +77,20 @@ namespace Application.Books.Mappers
                 ISBN = book.ISBN,
                 PublishedYear = book.PublishedYear,
                 CopiesAvailable = book.CopiesAvailable
+            };
+        }
+
+        public static GetBookByIdQueryOutput ToGetBookByIdOutput(this Book book)
+        {
+            return new GetBookByIdQueryOutput
+            {
+                Id = book.Id,
+                Title = book.Title,
+                AuthorId = book.AuthorId,
+                ISBN = book.ISBN,
+                PublishedYear = book.PublishedYear,
+                CopiesAvailable = book.CopiesAvailable,
+                Genre = book.Genre
             };
         }
 

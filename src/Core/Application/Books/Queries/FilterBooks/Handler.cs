@@ -19,15 +19,8 @@ namespace FilterBooks
         public async Task<IEnumerable<FilterBooksQueryOutput>> Handle(FilterBooksQueryInput input, CancellationToken ct = default)
         {
             await _validator.ValidateAndThrowAsync(input, ct);
-
-            var genre = string.IsNullOrWhiteSpace(input.Genre) ? null : input.Genre;
-            var filter = new BookFilter
-            {
-                Genre = genre
-            };
-
+            var filter = BookFilter.Create(genre: input.Genre);
             var books = await _bookRepository.Filter(filter, ct);
-
             return books.Select(book => book.ToFilterBooksOutput());
         }
     }

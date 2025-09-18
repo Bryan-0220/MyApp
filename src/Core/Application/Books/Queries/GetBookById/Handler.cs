@@ -1,4 +1,6 @@
 using Application.Interfaces;
+using Application.Books.Mappers;
+using Domain.Results;
 
 namespace GetBookById
 {
@@ -11,22 +13,11 @@ namespace GetBookById
             _bookRepository = bookRepository;
         }
 
-        public async Task<GetBookByIdQueryOutput?> Handle(GetBookByIdQueryInput query, CancellationToken ct = default)
+        public async Task<Result<GetBookByIdQueryOutput>> Handle(GetBookByIdQueryInput query, CancellationToken ct = default)
         {
             var book = await _bookRepository.GetById(query.Id, ct);
-            if (book is null) return null;
-
-            return new GetBookByIdQueryOutput
-            {
-                Id = book.Id,
-                Title = book.Title,
-                AuthorId = book.AuthorId,
-                ISBN = book.ISBN,
-                PublishedYear = book.PublishedYear,
-                CopiesAvailable = book.CopiesAvailable
-                ,
-                Genre = book.Genre
-            };
+            if (book is null) return Result<GetBookByIdQueryOutput>.Fail("Book not found");
+            return Result<GetBookByIdQueryOutput>.Ok(book.ToGetBookByIdOutput());
         }
     }
 }
