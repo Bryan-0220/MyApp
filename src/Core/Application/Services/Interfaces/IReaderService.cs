@@ -12,5 +12,6 @@ namespace Application.Readers.Services
         Task EnsureEmailNotInUse(string email, CancellationToken ct = default);
 
         Task<Reader> CreateReader(ReaderData input, CancellationToken ct = default);
+        Task<Reader> UpdateReader(UpdateReader.UpdateReaderCommandInput input, CancellationToken ct = default);
     }
 }

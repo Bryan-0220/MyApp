@@ -1,57 +1,25 @@
-using Application.Interfaces;
-using Domain.Models;
-using FluentValidation;
 using Application.Readers.Mappers;
+using Application.Readers.Services;
+using FluentValidation;
 
 namespace UpdateReader
 {
     public class UpdateReaderCommandHandler : IUpdateReaderCommandHandler
     {
-        private readonly IReaderRepository _readerRepository;
+        private readonly IReaderService _readerService;
         private readonly IValidator<UpdateReaderCommandInput> _validator;
 
-        public UpdateReaderCommandHandler(IReaderRepository readerRepository, IValidator<UpdateReaderCommandInput> validator)
+        public UpdateReaderCommandHandler(IReaderService readerService, IValidator<UpdateReaderCommandInput> validator)
         {
-            _readerRepository = readerRepository;
+            _readerService = readerService;
             _validator = validator;
         }
 
-        public async Task<UpdateReaderCommandOutput?> Handle(UpdateReaderCommandInput input, CancellationToken ct = default)
+        public async Task<UpdateReaderCommandOutput> Handle(UpdateReaderCommandInput input, CancellationToken ct = default)
         {
             await _validator.ValidateAndThrowAsync(input, ct);
-
-            var readerToUpdate = await _readerRepository.GetById(input.Id, ct);
-            if (readerToUpdate is null) return null;
-
-            try
-            {
-                applyAttributes(input, readerToUpdate);
-            }
-            catch (Exception ex)
-            {
-                throw new InvalidOperationException(ex.Message);
-            }
-
-            await _readerRepository.Update(readerToUpdate, ct);
-
-            return readerToUpdate.ToUpdateReaderOutput();
-        }
-
-        private static void applyAttributes(UpdateReaderCommandInput input, Reader existing)
-        {
-            static bool IsMeaningful(string? s) => !string.IsNullOrWhiteSpace(s) && s != "string";
-
-            if (IsMeaningful(input.FirstName))
-                existing.FirstName = input.FirstName!.Trim();
-
-            if (IsMeaningful(input.LastName))
-                existing.LastName = input.LastName!.Trim();
-
-            if (IsMeaningful(input.Email))
-                existing.Email = input.Email!.Trim();
-
-            if (input.MembershipDate.HasValue)
-                existing.MembershipDate = input.MembershipDate.Value;
+            var updated = await _readerService.UpdateReader(input, ct);
+            return updated.ToUpdateReaderOutput();
         }
     }
 }

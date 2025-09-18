@@ -3,6 +3,7 @@ using Domain.Common;
 using Domain.Results;
 using Domain.Models;
 using Application.Filters;
+using UpdateReader;
 
 namespace Application.Readers.Services
 {
@@ -68,6 +69,34 @@ namespace Application.Readers.Services
             var reader = Reader.Create(input);
             var created = await _readerRepository.Create(reader, ct);
             return created;
+        }
+
+        public async Task<Reader> UpdateReader(UpdateReaderCommandInput input, CancellationToken ct = default)
+        {
+            var existing = await _readerRepository.GetById(input.Id, ct);
+            if (existing is null) throw new DomainException("Reader not found");
+
+            ApplyAttributes(input, existing);
+
+            await _readerRepository.Update(existing, ct);
+            return existing;
+        }
+
+        private static void ApplyAttributes(UpdateReaderCommandInput input, Reader existing)
+        {
+            static bool IsMeaningful(string? s) => !string.IsNullOrWhiteSpace(s) && s != "string";
+
+            if (IsMeaningful(input.FirstName))
+                existing.FirstName = input.FirstName!.Trim();
+
+            if (IsMeaningful(input.LastName))
+                existing.LastName = input.LastName!.Trim();
+
+            if (IsMeaningful(input.Email))
+                existing.Email = input.Email!.Trim();
+
+            if (input.MembershipDate.HasValue)
+                existing.MembershipDate = input.MembershipDate.Value;
         }
 
         public async Task EnsureEmailNotInUse(string email, CancellationToken ct = default)
