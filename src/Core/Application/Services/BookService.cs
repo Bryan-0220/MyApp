@@ -73,13 +73,13 @@ namespace Application.Books.Services
             var existing = await _bookRepository.GetById(input.Id, ct);
             if (existing is null) throw new DomainException("Book not found");
 
-            applyAttributes(input, existing);
+            ApplyAttributes(input, existing);
 
             await _bookRepository.Update(existing, ct);
             return existing;
         }
 
-        private static void applyAttributes(UpdateBookCommandInput input, Book existing)
+        private static void ApplyAttributes(UpdateBookCommandInput input, Book existing)
         {
             if (!string.IsNullOrWhiteSpace(input.Title) && input.Title != "string")
                 existing.SetTitle(input.Title!.Trim());
@@ -99,9 +99,6 @@ namespace Application.Books.Services
             if (!string.IsNullOrWhiteSpace(input.Genre) && input.Genre != "string")
                 existing.SetGenre(input.Genre!.Trim());
         }
-
-
-
 
         public async Task EnsureCanDelete(string bookId, CancellationToken ct = default)
         {

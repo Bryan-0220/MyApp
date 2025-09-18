@@ -1,4 +1,3 @@
-using Application.Interfaces;
 using FluentValidation;
 using Application.Readers.Services;
 using Application.Readers.Mappers;
@@ -7,13 +6,11 @@ namespace DeleteReader
 {
     public class DeleteReaderCommandHandler : IDeleteReaderCommandHandler
     {
-        private readonly IReaderRepository _readerRepository;
         private readonly IReaderService _readerService;
         private readonly IValidator<DeleteReaderCommandInput> _validator;
 
-        public DeleteReaderCommandHandler(IReaderRepository readerRepository, IReaderService readerService, IValidator<DeleteReaderCommandInput> validator)
+        public DeleteReaderCommandHandler(IReaderService readerService, IValidator<DeleteReaderCommandInput> validator)
         {
-            _readerRepository = readerRepository;
             _readerService = readerService;
             _validator = validator;
         }

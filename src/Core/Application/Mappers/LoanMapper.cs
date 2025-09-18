@@ -11,11 +11,11 @@ namespace Application.Loans.Mappers
 {
     public static class LoanMapper
     {
-        public static Domain.Models.LoanData ToData(this CreateLoan.CreateLoanCommandInput input)
+        public static LoanData ToData(this CreateLoanCommandInput input)
         {
             if (input == null) return null!;
 
-            return new Domain.Models.LoanData
+            return new LoanData
             {
                 BookId = input.BookId?.Trim() ?? string.Empty,
                 ReaderId = input.ReaderId?.Trim() ?? string.Empty,

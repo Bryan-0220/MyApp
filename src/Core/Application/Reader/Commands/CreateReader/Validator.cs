@@ -1,16 +1,11 @@
 using FluentValidation;
-using Application.Interfaces;
 
 namespace CreateReader
 {
     public class CreateReaderCommandValidator : AbstractValidator<CreateReaderCommandInput>
     {
-        private readonly IReaderRepository _readerRepository;
-
-        public CreateReaderCommandValidator(IReaderRepository readerRepository)
+        public CreateReaderCommandValidator()
         {
-            _readerRepository = readerRepository;
-
             RuleFor(x => x.FirstName)
                 .NotEmpty().WithMessage("FirstName is required")
                 .MaximumLength(100).WithMessage("FirstName must be at most 100 characters");

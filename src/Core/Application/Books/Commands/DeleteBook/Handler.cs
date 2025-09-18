@@ -8,13 +8,11 @@ namespace DeleteBook
 {
     public class DeleteBookCommandHandler : IDeleteBookCommandHandler
     {
-        private readonly IBookRepository _bookRepository;
         private readonly IValidator<DeleteBookCommandInput> _validator;
         private readonly IBookService _bookService;
 
-        public DeleteBookCommandHandler(IBookRepository bookRepository, IValidator<DeleteBookCommandInput> validator, IBookService bookService)
+        public DeleteBookCommandHandler(IValidator<DeleteBookCommandInput> validator, IBookService bookService)
         {
-            _bookRepository = bookRepository;
             _validator = validator;
             _bookService = bookService;
         }

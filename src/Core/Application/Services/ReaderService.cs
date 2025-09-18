@@ -18,19 +18,11 @@ namespace Application.Readers.Services
             _loanRepository = loanRepository;
         }
 
-        public async Task<Reader> GetReaderOrThrow(string readerId, CancellationToken ct = default)
-        {
-            var reader = await _readerRepository.GetById(readerId, ct);
-            if (reader == null) throw new DomainException("Reader not found.");
-            return reader;
-        }
-
         public async Task EnsureExists(string readerId, CancellationToken ct = default)
         {
             var reader = await _readerRepository.GetById(readerId, ct);
             if (reader == null) throw new DomainException("Reader not found.");
         }
-
 
         public async Task<Result<Reader>> DeleteReader(string readerId, CancellationToken ct = default)
         {

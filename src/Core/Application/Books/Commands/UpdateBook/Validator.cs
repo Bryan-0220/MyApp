@@ -1,16 +1,11 @@
 using FluentValidation;
-using Application.Interfaces;
 
 namespace UpdateBook
 {
     public class UpdateBookCommandValidator : AbstractValidator<UpdateBookCommandInput>
     {
-        private readonly IBookRepository _bookRepository;
-
-        public UpdateBookCommandValidator(IBookRepository bookRepository)
+        public UpdateBookCommandValidator()
         {
-            _bookRepository = bookRepository;
-
             RuleFor(x => x.Id)
                 .NotEmpty().WithMessage("Id is required");
 
@@ -27,14 +22,7 @@ namespace UpdateBook
             RuleFor(x => x.ISBN)
                 .Cascade(CascadeMode.Stop)
                 .Must(isbn => string.IsNullOrWhiteSpace(isbn) || isbn == "string" || isbn.Trim().Length == 5)
-                .WithMessage("ISBN must be exactly 5 characters")
-                .MustAsync(async (input, isbn, ct) =>
-                {
-                    if (string.IsNullOrWhiteSpace(isbn) || isbn == "string") return true;
-                    var count = await _bookRepository.Count(b => b.ISBN == isbn && b.Id != input.Id, ct);
-                    return count == 0;
-                })
-                .WithMessage("Ya existe un libro con ese ISBN.");
+                .WithMessage("ISBN must be exactly 5 characters");
 
             RuleFor(x => x.PublishedYear)
                 .InclusiveBetween(0, 9999).WithMessage("PublishedYear must be a valid year")

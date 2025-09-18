@@ -38,18 +38,14 @@ namespace Application.Authors.Services
             {
                 AuthorId = authorId
             };
-
             var books = await _bookRepository.Filter(filter, ct);
             if (books != null && books.Any())
-            {
                 throw new DomainException("Author cannot be deleted while they have registered books.");
-            }
         }
 
         public async Task<Author> CreateAuthor(AuthorData input, CancellationToken ct)
         {
             await EnsureCanCreate(input.Name, ct);
-
             var author = Author.Create(input);
             var created = await _authorRepository.Create(author, ct);
             return created;
@@ -61,13 +57,13 @@ namespace Application.Authors.Services
             if (existing is null)
                 throw new DomainException("Author not found");
 
-            applyAttributes(input, existing);
+            ApplyAttributes(input, existing);
 
             await _authorRepository.Update(existing, ct);
             return existing;
         }
 
-        private static void applyAttributes(UpdateAuthorCommandInput input, Author existing)
+        private static void ApplyAttributes(UpdateAuthorCommandInput input, Author existing)
         {
             if (!string.IsNullOrWhiteSpace(input.Name) && input.Name != "string")
                 existing.SetName(input.Name!.Trim());
@@ -92,19 +88,18 @@ namespace Application.Authors.Services
         {
             var existing = await _authorRepository.GetById(authorId, ct);
             if (existing is null)
-                return Domain.Results.Result<Author>.Fail("Author not found");
-
+                return Result<Author>.Fail("Author not found");
             try
             {
                 await EnsureCanDelete(authorId, ct);
             }
             catch (DomainException dex)
             {
-                return Domain.Results.Result<Author>.Fail(dex.Message);
+                return Result<Author>.Fail(dex.Message);
             }
 
             await _authorRepository.Delete(authorId, ct);
-            return Domain.Results.Result<Author>.Ok(existing, "Author deleted");
+            return Result<Author>.Ok(existing, "Author deleted");
         }
     }
 }

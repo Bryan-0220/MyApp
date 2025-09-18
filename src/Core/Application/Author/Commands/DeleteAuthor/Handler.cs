@@ -8,13 +8,11 @@ namespace DeleteAuthor
 {
     public class DeleteAuthorCommandHandler : IDeleteAuthorCommandHandler
     {
-        private readonly IAuthorRepository _authorRepository;
         private readonly IAuthorService _deletionService;
         private readonly IValidator<DeleteAuthorCommandInput> _validator;
 
-        public DeleteAuthorCommandHandler(IAuthorRepository authorRepository, IAuthorService deletionService, IValidator<DeleteAuthorCommandInput> validator)
+        public DeleteAuthorCommandHandler(IAuthorService deletionService, IValidator<DeleteAuthorCommandInput> validator)
         {
-            _authorRepository = authorRepository;
             _deletionService = deletionService;
             _validator = validator;
         }

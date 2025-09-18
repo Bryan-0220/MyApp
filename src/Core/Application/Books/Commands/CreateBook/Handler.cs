@@ -19,10 +19,8 @@ namespace CreateBook
         public async Task<CreateBookCommandOutput> Handle(CreateBookCommandInput input, CancellationToken ct = default)
         {
             await _validator.ValidateAndThrowAsync(input, ct);
-
             var book = Book.Create(input.ToData());
             var created = await _bookRepository.Create(book, ct);
-
             return created.ToCreateBookOutput();
         }
     }
