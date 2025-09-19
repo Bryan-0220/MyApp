@@ -33,7 +33,7 @@ namespace Tests.Domain
         [Fact]
         public void Create_ShouldThrowDomainException_WhenInputIsNull()
         {
-            Assert.Throws<DomainException>(() => Author.Create(null!));
+            Assert.Throws<BusinessRuleException>(() => Author.Create(null!));
         }
 
         [Fact]
@@ -48,7 +48,7 @@ namespace Tests.Domain
                 Genres = new[] { "General" }
             };
 
-            Assert.Throws<DomainException>(() => Author.Create(input));
+            Assert.Throws<BusinessRuleException>(() => Author.Create(input));
         }
 
         [Fact]
@@ -63,7 +63,7 @@ namespace Tests.Domain
             Assert.Equal(new DateOnly(1900, 1, 1), a.BirthDate);
             Assert.Equal(new DateOnly(1950, 1, 1), a.DeathDate);
 
-            Assert.Throws<DomainException>(() => a.SetBirthDate(new DateOnly(2000, 1, 1)));
+            Assert.Throws<BusinessRuleException>(() => a.SetBirthDate(new DateOnly(2000, 1, 1)));
         }
 
         [Fact]
@@ -106,7 +106,7 @@ namespace Tests.Domain
                 Genres = genres
             };
 
-            Assert.Throws<DomainException>(() => Author.Create(input));
+            Assert.Throws<BusinessRuleException>(() => Author.Create(input));
         }
 
     }

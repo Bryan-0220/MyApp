@@ -28,7 +28,7 @@ namespace Tests.Domain
         [Fact]
         public void Create_ShouldThrowDomainException_WhenInputIsNull()
         {
-            Assert.Throws<DomainException>(() => Reader.Create(null!));
+            Assert.Throws<BusinessRuleException>(() => Reader.Create(null!));
         }
 
         [Theory]
@@ -49,7 +49,7 @@ namespace Tests.Domain
 
             data.MembershipDate = new DateOnly(2020, 1, 1);
 
-            Assert.Throws<DomainException>(() => Reader.Create(data));
+            Assert.Throws<BusinessRuleException>(() => Reader.Create(data));
         }
 
         [Fact]
@@ -63,7 +63,7 @@ namespace Tests.Domain
                 MembershipDate = null
             };
 
-            Assert.Throws<DomainException>(() => Reader.Create(data));
+            Assert.Throws<BusinessRuleException>(() => Reader.Create(data));
         }
 
         [Fact]

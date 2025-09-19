@@ -32,7 +32,7 @@ namespace Tests.Domain
         [Fact]
         public void Create_ShouldThrowDomainException_WhenInputIsNull()
         {
-            Assert.Throws<DomainException>(() => Book.Create(null!));
+            Assert.Throws<BusinessRuleException>(() => Book.Create(null!));
         }
 
         [Fact]
@@ -47,7 +47,7 @@ namespace Tests.Domain
                 Genre = "Fiction"
             };
 
-            Assert.Throws<DomainException>(() => Book.Create(data));
+            Assert.Throws<BusinessRuleException>(() => Book.Create(data));
         }
 
         [Theory]
@@ -70,7 +70,7 @@ namespace Tests.Domain
                 Genre = genre!
             };
 
-            Assert.Throws<DomainException>(() => Book.Create(data));
+            Assert.Throws<BusinessRuleException>(() => Book.Create(data));
         }
 
         [Fact]
@@ -86,7 +86,7 @@ namespace Tests.Domain
 
             var book = Book.Create(data);
 
-            Assert.Throws<DomainException>(() => book.EnsureHasAvailableCopies());
+            Assert.Throws<BusinessRuleException>(() => book.EnsureHasAvailableCopies());
         }
 
 
@@ -95,7 +95,7 @@ namespace Tests.Domain
         {
             var data = new BookData { Title = "T", AuthorId = "A", CopiesAvailable = 1, Genre = "G" };
             var b = Book.Create(data);
-            Assert.Throws<DomainException>(() => b.SetCopiesAvailable(-5));
+            Assert.Throws<BusinessRuleException>(() => b.SetCopiesAvailable(-5));
         }
 
         [Fact]

@@ -10,7 +10,7 @@ namespace Tests.Domain
         [Fact]
         public void Create_ShouldThrowDomainException_WhenInputIsNull()
         {
-            Assert.Throws<DomainException>(() => Loan.Create(null!));
+            Assert.Throws<BusinessRuleException>(() => Loan.Create(null!));
         }
 
         [Fact]
@@ -70,7 +70,7 @@ namespace Tests.Domain
                 DueDate = loanDate.AddDays(dueOffsetDays)
             };
 
-            Assert.Throws<DomainException>(() => Loan.Create(data));
+            Assert.Throws<BusinessRuleException>(() => Loan.Create(data));
         }
 
     }
