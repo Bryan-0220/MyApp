@@ -20,7 +20,7 @@ namespace Application.Authors.Services
 
         public async Task EnsureCanCreate(string name, CancellationToken ct = default)
         {
-            if (string.IsNullOrWhiteSpace(name)) throw new DomainException("Name is required");
+            if (string.IsNullOrWhiteSpace(name)) throw new BusinessRuleException("Name is required");
 
             var filter = new AuthorFilter
             {
@@ -29,7 +29,7 @@ namespace Application.Authors.Services
 
             var existing = await _authorRepository.Filter(filter, ct);
             if (existing != null && existing.Any())
-                throw new DomainException("An author with the same name already exists.");
+                throw new DuplicateException("An author with the same name already exists.");
         }
 
         public async Task EnsureCanDelete(string authorId, CancellationToken ct = default)
@@ -40,7 +40,7 @@ namespace Application.Authors.Services
             };
             var books = await _bookRepository.Filter(filter, ct);
             if (books != null && books.Any())
-                throw new DomainException("Author cannot be deleted while they have registered books.");
+                throw new BusinessRuleException("Author cannot be deleted while they have registered books.");
         }
 
         public async Task<Author> CreateAuthor(AuthorData input, CancellationToken ct)
@@ -55,7 +55,7 @@ namespace Application.Authors.Services
         {
             var existing = await _authorRepository.GetById(input.Id, ct);
             if (existing is null)
-                throw new DomainException("Author not found");
+                throw new NotFoundException("Author not found");
 
             ApplyAttributes(input, existing);
 
@@ -89,6 +89,7 @@ namespace Application.Authors.Services
             var existing = await _authorRepository.GetById(authorId, ct);
             if (existing is null)
                 return Result<Author>.Fail("Author not found");
+
             try
             {
                 await EnsureCanDelete(authorId, ct);

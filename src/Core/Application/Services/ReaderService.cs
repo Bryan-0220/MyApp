@@ -21,7 +21,7 @@ namespace Application.Readers.Services
         public async Task EnsureExists(string readerId, CancellationToken ct = default)
         {
             var reader = await _readerRepository.GetById(readerId, ct);
-            if (reader == null) throw new DomainException("Reader not found.");
+            if (reader == null) throw new NotFoundException("Reader not found.");
         }
 
         public async Task<Result<Reader>> DeleteReader(string readerId, CancellationToken ct = default)
@@ -45,7 +45,11 @@ namespace Application.Readers.Services
                 await EnsureCanDelete(readerId, ct);
                 return (true, string.Empty);
             }
-            catch (DomainException ex)
+            catch (BusinessRuleException ex)
+            {
+                return (false, ex.Message);
+            }
+            catch (DuplicateException ex)
             {
                 return (false, ex.Message);
             }
@@ -66,7 +70,7 @@ namespace Application.Readers.Services
         public async Task<Reader> UpdateReader(UpdateReaderCommandInput input, CancellationToken ct = default)
         {
             var existing = await _readerRepository.GetById(input.Id, ct);
-            if (existing is null) throw new DomainException("Reader not found");
+            if (existing is null) throw new NotFoundException("Reader not found");
 
             ApplyAttributes(input, existing);
 
@@ -96,7 +100,7 @@ namespace Application.Readers.Services
             var filter = new ReaderFilter { Email = email };
             var results = await _readerRepository.Filter(filter, ct);
             if (results != null && results.Any())
-                throw new DomainException("Email is already registered for another reader.");
+                throw new DuplicateException("Email is already registered for another reader.");
         }
 
         public async Task EnsureCanDelete(string readerId, CancellationToken ct = default)
@@ -110,7 +114,7 @@ namespace Application.Readers.Services
             var loans = await _loanRepository.Filter(filter, ct);
             if (loans != null && loans.Any())
             {
-                throw new DomainException("Reader cannot be deleted while has active loans.");
+                throw new BusinessRuleException("Reader cannot be deleted while has active loans.");
             }
         }
     }

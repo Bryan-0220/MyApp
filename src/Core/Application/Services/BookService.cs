@@ -39,7 +39,11 @@ namespace Application.Books.Services
                 await EnsureCanDelete(bookId, ct);
                 return (true, string.Empty);
             }
-            catch (DomainException ex)
+            catch (BusinessRuleException ex)
+            {
+                return (false, ex.Message);
+            }
+            catch (DuplicateException ex)
             {
                 return (false, ex.Message);
             }
@@ -52,26 +56,26 @@ namespace Application.Books.Services
         public async Task<Book> GetBookOrThrow(string bookId, CancellationToken ct = default)
         {
             var book = await _bookRepository.GetById(bookId, ct);
-            if (book == null) throw new DomainException("Book not found.");
+            if (book == null) throw new NotFoundException("Book not found.");
             return book;
         }
 
         public async Task DecreaseCopiesOrThrow(string bookId, CancellationToken ct = default)
         {
             var changed = await _bookRepository.TryChangeCopies(bookId, -1, ct);
-            if (!changed) throw new DomainException("No copies available for the requested book.");
+            if (!changed) throw new BusinessRuleException("No copies available for the requested book.");
         }
 
         public async Task RestoreCopies(string bookId, CancellationToken ct = default)
         {
             var changed = await _bookRepository.TryChangeCopies(bookId, +1, ct);
-            if (!changed) throw new DomainException("Failed to restore book copies after loan creation failure.");
+            if (!changed) throw new BusinessRuleException("Failed to restore book copies after loan creation failure.");
         }
 
         public async Task<Book> UpdateBook(UpdateBookCommandInput input, CancellationToken ct = default)
         {
             var existing = await _bookRepository.GetById(input.Id, ct);
-            if (existing is null) throw new DomainException("Book not found");
+            if (existing is null) throw new NotFoundException("Book not found");
 
             ApplyAttributes(input, existing);
 
@@ -111,7 +115,7 @@ namespace Application.Books.Services
             var loans = await _loanRepository.Filter(filter, ct);
             if (loans != null && loans.Any())
             {
-                throw new DomainException("Book cannot be deleted while it has active loans.");
+                throw new BusinessRuleException("Book cannot be deleted while it has active loans.");
             }
         }
     }

@@ -33,7 +33,7 @@ namespace Application.Loans.Services
 
             var loans = await _loanRepository.Filter(filter, ct);
             if (loans != null && loans.Any())
-                throw new DomainException("Reader already has this book on loan.");
+                throw new DuplicateException("Reader already has this book on loan.");
         }
 
         public async Task<Result<Loan>> DeleteLoan(string loanId, CancellationToken ct = default)
@@ -79,7 +79,11 @@ namespace Application.Loans.Services
                 await _bookService.RestoreCopies(bookId, ct);
                 return (true, string.Empty);
             }
-            catch (DomainException ex)
+            catch (BusinessRuleException ex)
+            {
+                return (false, ex.Message);
+            }
+            catch (DuplicateException ex)
             {
                 return (false, ex.Message);
             }
@@ -92,7 +96,7 @@ namespace Application.Loans.Services
         public async Task<Loan> UpdateLoan(UpdateLoanCommandInput input, CancellationToken ct = default)
         {
             var existing = await _loanRepository.GetById(input.Id, ct);
-            if (existing is null) throw new DomainException("Loan not found");
+            if (existing is null) throw new NotFoundException("Loan not found");
 
             ApplyUpdates(input, existing);
 
