@@ -94,9 +94,17 @@ namespace Application.Authors.Services
             {
                 await EnsureCanDelete(authorId, ct);
             }
-            catch (DomainException dex)
+            catch (BusinessRuleException ex)
             {
-                return Result<Author>.Fail(dex.Message);
+                return Result<Author>.Fail(ex.Message);
+            }
+            catch (DuplicateException ex)
+            {
+                return Result<Author>.Fail(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return Result<Author>.Fail($"Unexpected error: {ex.Message}");
             }
 
             await _authorRepository.Delete(authorId, ct);

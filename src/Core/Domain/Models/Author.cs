@@ -41,22 +41,22 @@ namespace Domain.Models
 
         private static void ValidateForCreate(AuthorData? input)
         {
-            if (input == null) throw new DomainException("Input is required");
-            if (string.IsNullOrWhiteSpace(input.Name)) throw new DomainException("Name is required");
-            if (input.Genres == null) throw new DomainException("Genres are required");
+            if (input == null) throw new BusinessRuleException("Input is required");
+            if (string.IsNullOrWhiteSpace(input.Name)) throw new BusinessRuleException("Name is required");
+            if (input.Genres == null) throw new BusinessRuleException("Genres are required");
 
             var hasAnyGenre = input.Genres.Any(g => !string.IsNullOrWhiteSpace(g));
-            if (!hasAnyGenre) throw new DomainException("At least one genre is required");
+            if (!hasAnyGenre) throw new BusinessRuleException("At least one genre is required");
 
-            if (string.IsNullOrWhiteSpace(input.Nationality)) throw new DomainException("Nationality is required");
+            if (string.IsNullOrWhiteSpace(input.Nationality)) throw new BusinessRuleException("Nationality is required");
 
             if (input.BirthDate.HasValue && input.DeathDate.HasValue && input.DeathDate < input.BirthDate)
-                throw new DomainException("DeathDate cannot be before BirthDate");
+                throw new BusinessRuleException("DeathDate cannot be before BirthDate");
         }
 
         public void SetName(string name)
         {
-            if (string.IsNullOrWhiteSpace(name)) throw new DomainException("Name is required");
+            if (string.IsNullOrWhiteSpace(name)) throw new BusinessRuleException("Name is required");
             Name = StringNormalizer.Normalize(name) ?? string.Empty;
         }
 
@@ -73,18 +73,18 @@ namespace Domain.Models
         public void SetBirthDate(DateOnly? birthDate)
         {
             BirthDate = birthDate;
-            if (BirthDate.HasValue && DeathDate.HasValue && DeathDate < BirthDate) throw new DomainException("DeathDate cannot be before BirthDate");
+            if (BirthDate.HasValue && DeathDate.HasValue && DeathDate < BirthDate) throw new BusinessRuleException("DeathDate cannot be before BirthDate");
         }
 
         public void SetDeathDate(DateOnly? deathDate)
         {
             DeathDate = deathDate;
-            if (BirthDate.HasValue && DeathDate.HasValue && DeathDate < BirthDate) throw new DomainException("DeathDate cannot be before BirthDate");
+            if (BirthDate.HasValue && DeathDate.HasValue && DeathDate < BirthDate) throw new BusinessRuleException("DeathDate cannot be before BirthDate");
         }
 
         public void AddGenre(string genre)
         {
-            if (string.IsNullOrWhiteSpace(genre)) throw new DomainException("Genre is required");
+            if (string.IsNullOrWhiteSpace(genre)) throw new BusinessRuleException("Genre is required");
             Genres.Add(StringNormalizer.Normalize(genre)!);
         }
 

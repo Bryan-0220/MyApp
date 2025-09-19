@@ -35,22 +35,22 @@ namespace Domain.Models
 
         private static void ValidateForCreate(BookData? data)
         {
-            if (data == null) throw new DomainException("Input is required");
-            if (string.IsNullOrWhiteSpace(data.Title)) throw new DomainException("Title is required");
-            if (data.CopiesAvailable < 0) throw new DomainException("CopiesAvailable must be >= 0");
-            if (string.IsNullOrWhiteSpace(data.AuthorId)) throw new DomainException("AuthorId is required");
-            if (string.IsNullOrWhiteSpace(data.Genre)) throw new DomainException("Genre is required");
+            if (data == null) throw new BusinessRuleException("Input is required");
+            if (string.IsNullOrWhiteSpace(data.Title)) throw new BusinessRuleException("Title is required");
+            if (data.CopiesAvailable < 0) throw new BusinessRuleException("CopiesAvailable must be >= 0");
+            if (string.IsNullOrWhiteSpace(data.AuthorId)) throw new BusinessRuleException("AuthorId is required");
+            if (string.IsNullOrWhiteSpace(data.Genre)) throw new BusinessRuleException("Genre is required");
         }
 
         public void SetTitle(string title)
         {
-            if (string.IsNullOrWhiteSpace(title)) throw new DomainException("Title is required");
+            if (string.IsNullOrWhiteSpace(title)) throw new BusinessRuleException("Title is required");
             Title = StringNormalizer.Normalize(title) ?? string.Empty;
         }
 
         public void SetAuthor(string authorId)
         {
-            if (string.IsNullOrWhiteSpace(authorId)) throw new DomainException("AuthorId is required");
+            if (string.IsNullOrWhiteSpace(authorId)) throw new BusinessRuleException("AuthorId is required");
             AuthorId = StringNormalizer.Normalize(authorId) ?? string.Empty;
         }
 
@@ -63,7 +63,7 @@ namespace Domain.Models
             }
 
             if (!Isbn.TryParse(isbn, out var vo, out var error))
-                throw new DomainException(error ?? "Invalid ISBN");
+                throw new BusinessRuleException(error ?? "Invalid ISBN");
 
             ISBN = vo!.Value;
         }
@@ -75,18 +75,18 @@ namespace Domain.Models
 
         public void SetCopiesAvailable(int copies)
         {
-            if (copies < 0) throw new DomainException("CopiesAvailable must be >= 0");
+            if (copies < 0) throw new BusinessRuleException("CopiesAvailable must be >= 0");
             CopiesAvailable = copies;
         }
 
         public void EnsureHasAvailableCopies()
         {
-            if (CopiesAvailable < 1) throw new DomainException("No copies available for this book");
+            if (CopiesAvailable < 1) throw new BusinessRuleException("No copies available for this book");
         }
 
         public void SetGenre(string genre)
         {
-            if (string.IsNullOrWhiteSpace(genre)) throw new DomainException("Genre is required");
+            if (string.IsNullOrWhiteSpace(genre)) throw new BusinessRuleException("Genre is required");
             Genre = StringNormalizer.Normalize(genre) ?? string.Empty;
         }
     }

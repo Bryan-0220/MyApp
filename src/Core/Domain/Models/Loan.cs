@@ -21,14 +21,14 @@ namespace Domain.Models
 
         public static Loan Create(LoanData data)
         {
-            if (data == null) throw new DomainException("Input is required");
+            if (data == null) throw new BusinessRuleException("Input is required");
 
             var bookId = (data.BookId ?? string.Empty).Trim();
             var readerId = (data.ReaderId ?? string.Empty).Trim();
 
             if (string.IsNullOrWhiteSpace(bookId) || string.IsNullOrWhiteSpace(readerId) || data.LoanDate == null || data.DueDate == null)
             {
-                throw new DomainException("All loan attributes (BookId, ReaderId, LoanDate, DueDate) are required");
+                throw new BusinessRuleException("All loan attributes (BookId, ReaderId, LoanDate, DueDate) are required");
             }
 
             var loanDate = data.LoanDate.Value;
@@ -36,7 +36,7 @@ namespace Domain.Models
 
             if (dueDate < loanDate)
             {
-                throw new DomainException("DueDate must be the same day as LoanDate or later");
+                throw new BusinessRuleException("DueDate must be the same day as LoanDate or later");
             }
 
             var loan = new Loan
