@@ -28,6 +28,7 @@ using UpdateReader;
 using GetAllReaders;
 using GetReaderById;
 using FilterReaders;
+using EntryPoint.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -122,6 +123,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Global exception handling middleware (maps DomainException -> 400, logs others)
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseAuthorization();
 
