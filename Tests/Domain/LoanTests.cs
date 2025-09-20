@@ -33,8 +33,6 @@ namespace Tests.Domain
             Assert.Equal(LoanStatus.Active, loan.Status);
         }
 
-        // consolidated required-field tests above
-
         [Fact]
         public void Create_ShouldAllowEqualLoanAndDueDate_AndSetStatusActive()
         {

@@ -61,7 +61,6 @@ namespace Application.Authors.Services
             if (existing is null)
                 throw new NotFoundException("Author not found");
 
-            // If the name is being changed, ensure no other author uses it
             if (!string.IsNullOrWhiteSpace(input.Name) && input.Name != "string")
             {
                 await EnsureCanCreate(input.Name.Trim(), input.Id, ct);

@@ -1,4 +1,5 @@
 using Application.Readers.Services;
+using Application.Filters;
 using Application.Interfaces;
 using Domain.Models;
 using Domain.Common;
@@ -58,7 +59,7 @@ namespace Tests
             var readerRepo = A.Fake<IReaderRepository>();
             var loanRepo = A.Fake<ILoanRepository>();
             var input = new ReaderData { FirstName = "F", LastName = "L", Email = "e@x.com", MembershipDate = DateOnly.FromDateTime(System.DateTime.UtcNow) };
-            A.CallTo(() => readerRepo.Filter(A<Application.Filters.ReaderFilter>._, A<CancellationToken>._)).Returns(new List<Reader>());
+            A.CallTo(() => readerRepo.Filter(A<ReaderFilter>._, A<CancellationToken>._)).Returns(new List<Reader>());
             A.CallTo(() => readerRepo.Create(A<Reader>._, A<CancellationToken>._)).ReturnsLazily((Reader r, CancellationToken _) => Task.FromResult(r));
             var service = new ReaderService(readerRepo, loanRepo);
             var created = await service.CreateReader(input);
@@ -72,7 +73,7 @@ namespace Tests
             var readerRepo = A.Fake<IReaderRepository>();
             var loanRepo = A.Fake<ILoanRepository>();
             var existing = new Reader { Id = "r-existing", FirstName = "F", LastName = "L", Email = "e@x.com", MembershipDate = DateOnly.FromDateTime(System.DateTime.UtcNow) };
-            A.CallTo(() => readerRepo.Filter(A<Application.Filters.ReaderFilter>._, A<CancellationToken>._)).Returns(new[] { existing });
+            A.CallTo(() => readerRepo.Filter(A<ReaderFilter>._, A<CancellationToken>._)).Returns(new[] { existing });
             var service = new ReaderService(readerRepo, loanRepo);
             await Assert.ThrowsAsync<DuplicateException>(() => service.CreateReader(new ReaderData { FirstName = "F", LastName = "L", Email = "e@x.com", MembershipDate = DateOnly.FromDateTime(System.DateTime.UtcNow) }));
         }
@@ -101,16 +102,15 @@ namespace Tests
             var readerRepo = A.Fake<IReaderRepository>();
             var loanRepo = A.Fake<ILoanRepository>();
 
-            // existing reader we want to update
+
             var rd = new ReaderData { FirstName = "F", LastName = "L", Email = "old@x.com", MembershipDate = DateOnly.FromDateTime(System.DateTime.UtcNow) };
             var reader = Reader.Create(rd);
             reader.Id = "r-1";
 
-            // another reader already using the target email
             var other = new Reader { Id = "r-2", FirstName = "A", LastName = "B", Email = "taken@x.com", MembershipDate = DateOnly.FromDateTime(System.DateTime.UtcNow) };
 
             A.CallTo(() => readerRepo.GetById("r-1", A<CancellationToken>._)).Returns(Task.FromResult<Reader?>(reader));
-            A.CallTo(() => readerRepo.Filter(A<Application.Filters.ReaderFilter>._, A<CancellationToken>._)).Returns(new[] { other });
+            A.CallTo(() => readerRepo.Filter(A<ReaderFilter>._, A<CancellationToken>._)).Returns(new[] { other });
 
             var service = new ReaderService(readerRepo, loanRepo);
 
@@ -135,7 +135,7 @@ namespace Tests
         {
             var readerRepo = A.Fake<IReaderRepository>();
             var loanRepo = A.Fake<ILoanRepository>();
-            A.CallTo(() => readerRepo.Filter(A<Application.Filters.ReaderFilter>._, A<CancellationToken>._)).Returns(new[] { new Reader() });
+            A.CallTo(() => readerRepo.Filter(A<ReaderFilter>._, A<CancellationToken>._)).Returns(new[] { new Reader() });
             var service = new ReaderService(readerRepo, loanRepo);
             await Assert.ThrowsAsync<DuplicateException>(() => service.EnsureEmailNotInUse("a@b.com"));
         }
@@ -145,7 +145,7 @@ namespace Tests
         {
             var readerRepo = A.Fake<IReaderRepository>();
             var loanRepo = A.Fake<ILoanRepository>();
-            A.CallTo(() => loanRepo.Filter(A<Application.Filters.LoanFilter>._, A<CancellationToken>._)).Returns(new[] { new Loan() });
+            A.CallTo(() => loanRepo.Filter(A<LoanFilter>._, A<CancellationToken>._)).Returns(new[] { new Loan() });
             var service = new ReaderService(readerRepo, loanRepo);
             await Assert.ThrowsAsync<BusinessRuleException>(() => service.EnsureCanDelete("r1"));
         }
@@ -155,7 +155,7 @@ namespace Tests
         {
             var readerRepo = A.Fake<IReaderRepository>();
             var loanRepo = A.Fake<ILoanRepository>();
-            A.CallTo(() => loanRepo.Filter(A<Application.Filters.LoanFilter>._, A<CancellationToken>._)).Returns(new List<Loan>());
+            A.CallTo(() => loanRepo.Filter(A<LoanFilter>._, A<CancellationToken>._)).Returns(new List<Loan>());
             var service = new ReaderService(readerRepo, loanRepo);
             await service.EnsureCanDelete("r1");
         }
@@ -172,7 +172,7 @@ namespace Tests
             reader.Id = "reader-1";
 
             A.CallTo(() => readerRepo.GetById("reader-1", A<CancellationToken>._)).Returns(Task.FromResult<Reader?>(reader));
-            A.CallTo(() => loanRepo.Filter(A<Application.Filters.LoanFilter>._, A<CancellationToken>._))
+            A.CallTo(() => loanRepo.Filter(A<LoanFilter>._, A<CancellationToken>._))
                 .Returns(new List<Loan> { new Loan { Id = "loan-1", BookId = "b1", ReaderId = "reader-1" } });
 
             var service = new ReaderService(readerRepo, loanRepo);
@@ -197,7 +197,7 @@ namespace Tests
             reader.Id = "reader-1";
 
             A.CallTo(() => readerRepo.GetById("reader-1", A<CancellationToken>._)).Returns(Task.FromResult<Reader?>(reader));
-            A.CallTo(() => loanRepo.Filter(A<Application.Filters.LoanFilter>._, A<CancellationToken>._)).Returns(new List<Loan>());
+            A.CallTo(() => loanRepo.Filter(A<LoanFilter>._, A<CancellationToken>._)).Returns(new List<Loan>());
             A.CallTo(() => readerRepo.Delete("reader-1", A<CancellationToken>._)).Returns(Task.FromResult(true));
 
             var service = new ReaderService(readerRepo, loanRepo);

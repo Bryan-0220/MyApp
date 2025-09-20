@@ -1,21 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Xunit;
 using FakeItEasy;
-
 using CreateAuthor;
 using UpdateAuthor;
-using DeleteAuthor;
 using GetAllAuthors;
 using GetAuthorById;
 using FilterAuthors;
 using Application.Authors.Services;
+using Application.Filters;
 using Application.Interfaces;
 using Domain.Models;
-using Domain.Results;
 using Domain.Common;
 
 namespace Tests.Service
@@ -48,7 +40,7 @@ namespace Tests.Service
             var author = new Author { Id = "author-1" };
 
             A.CallTo(() => repo.GetById("author-1", A<CancellationToken>._)).Returns(Task.FromResult<Author?>(author));
-            A.CallTo(() => bookRepo.Filter(A<Application.Filters.BookFilter>._, A<CancellationToken>._)).Returns(Task.FromResult<IEnumerable<Book>>(new List<Book>()));
+            A.CallTo(() => bookRepo.Filter(A<BookFilter>._, A<CancellationToken>._)).Returns(Task.FromResult<IEnumerable<Book>>(new List<Book>()));
             A.CallTo(() => repo.Delete("author-1", A<CancellationToken>._)).Returns(Task.FromResult(true));
 
             var service = new AuthorService(repo, bookRepo);
@@ -62,9 +54,9 @@ namespace Tests.Service
         }
 
         [Theory]
-        [InlineData("", "Test", new[] { "Fiction" })] // Nombre vacío
-        [InlineData("Test", "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", new[] { "Fiction" })] // Nacionalidad > 100
-        [InlineData("Test", "Test", new[] { "" })] // Género vacío
+        [InlineData("", "Test", new[] { "Fiction" })]
+        [InlineData("Test", "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", new[] { "Fiction" })]
+        [InlineData("Test", "Test", new[] { "" })]
         public async Task CreateAuthor_ShouldFailValidation(string name, string nationality, string[] genres)
         {
             var repo = A.Fake<IAuthorRepository>();
@@ -103,8 +95,7 @@ namespace Tests.Service
             var service = new AuthorService(repo, bookRepo);
             var handler = new CreateAuthorCommandHandler(A.Fake<FluentValidation.IValidator<CreateAuthorCommandInput>>(), service);
             var input = new CreateAuthorCommandInput { Name = "Test Author", Nationality = "Test", Genres = new[] { "Fiction" } };
-            // Simula que ya existe un autor con ese nombre
-            A.CallTo(() => repo.Filter(A<Application.Filters.AuthorFilter>._, A<CancellationToken>._)).Returns(new List<Author> { Author.Create(new AuthorData { Name = "Test Author", Nationality = "Test", Genres = new[] { "Fiction" } }) });
+            A.CallTo(() => repo.Filter(A<AuthorFilter>._, A<CancellationToken>._)).Returns(new List<Author> { Author.Create(new AuthorData { Name = "Test Author", Nationality = "Test", Genres = new[] { "Fiction" } }) });
             await Assert.ThrowsAsync<DuplicateException>(() => handler.Handle(input, CancellationToken.None));
         }
 
@@ -124,7 +115,7 @@ namespace Tests.Service
                 Nationality = "Testland",
                 Genres = new[] { "Fiction" }
             };
-            A.CallTo(() => repo.Filter(A<Application.Filters.AuthorFilter>._, A<CancellationToken>._)).Returns(new List<Author>());
+            A.CallTo(() => repo.Filter(A<AuthorFilter>._, A<CancellationToken>._)).Returns(new List<Author>());
             var author = Author.Create(new AuthorData
             {
                 Name = "Test Author",
@@ -183,7 +174,7 @@ namespace Tests.Service
             another.Id = "other-id";
 
             A.CallTo(() => repo.GetById("id", A<CancellationToken>._)).Returns(author);
-            A.CallTo(() => repo.Filter(A<Application.Filters.AuthorFilter>._, A<CancellationToken>._)).Returns(new[] { another });
+            A.CallTo(() => repo.Filter(A<AuthorFilter>._, A<CancellationToken>._)).Returns(new[] { another });
 
             var input = new UpdateAuthorCommandInput { Id = "id", Name = "Taken Name" };
 
@@ -251,7 +242,7 @@ namespace Tests.Service
             });
             author.Id = "id";
             var authors = new List<Author> { author };
-            A.CallTo(() => repo.Filter(A<Application.Filters.AuthorFilter>._, A<CancellationToken>._)).Returns(authors);
+            A.CallTo(() => repo.Filter(A<AuthorFilter>._, A<CancellationToken>._)).Returns(authors);
             var input = new FilterAuthorsQueryInput { Name = "A", Genres = new[] { "Fiction" } };
             var result = await handler.Handle(input, CancellationToken.None);
             Assert.Single(result);

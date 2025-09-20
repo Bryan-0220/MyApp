@@ -102,18 +102,15 @@ namespace Application.Loans.Services
             var existing = await _loanRepository.GetById(input.Id, ct);
             if (existing is null) throw new NotFoundException("Loan not found");
 
-            // If BookId or ReaderId are being changed, ensure new references exist and there are no duplicate active loans
             static bool IsMeaningful(string? s) => !string.IsNullOrWhiteSpace(s);
             if (IsMeaningful(input.BookId) || IsMeaningful(input.ReaderId))
             {
                 var targetBookId = IsMeaningful(input.BookId) ? input.BookId!.Trim() : existing.BookId;
                 var targetReaderId = IsMeaningful(input.ReaderId) ? input.ReaderId!.Trim() : existing.ReaderId;
 
-                // Ensure the book and reader exist
                 await _bookService.GetBookOrThrow(targetBookId, ct);
                 await _readerService.EnsureExists(targetReaderId, ct);
 
-                // Ensure no other active loan exists with same book+reader combination (exclude this loan)
                 await EnsureNoDuplicateLoan(targetBookId, targetReaderId, existing.Id, ct);
             }
 

@@ -72,7 +72,6 @@ namespace Application.Readers.Services
             var existing = await _readerRepository.GetById(input.Id, ct);
             if (existing is null) throw new NotFoundException("Reader not found");
 
-            // If email is being updated, ensure it's not already used by another reader
             static bool IsMeaningful(string? s) => !string.IsNullOrWhiteSpace(s) && s != "string";
             if (IsMeaningful(input.Email))
             {
@@ -109,7 +108,6 @@ namespace Application.Readers.Services
             var results = await _readerRepository.Filter(filter, ct);
             if (results != null)
             {
-                // If any result has a different Id than excludeId, it's a duplicate for our purposes
                 var hasOther = results.Any(r => !string.Equals(r.Id, excludeId, StringComparison.OrdinalIgnoreCase));
                 if (hasOther)
                     throw new DuplicateException("Email is already registered for another reader.");

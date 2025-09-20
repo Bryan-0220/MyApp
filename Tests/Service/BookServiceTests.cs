@@ -1,4 +1,6 @@
 using Application.Books.Services;
+using UpdateBook;
+using Application.Filters;
 using Application.Interfaces;
 using Domain.Models;
 using FakeItEasy;
@@ -83,7 +85,7 @@ namespace Tests
             A.CallTo(() => repo.GetById("b1", A<CancellationToken>._)).Returns(Task.FromResult<Book?>(book));
             A.CallTo(() => repo.Update(book, A<CancellationToken>._)).Returns(Task.FromResult(true));
             var service = new BookService(repo, loanRepo);
-            var input = new UpdateBook.UpdateBookCommandInput { Id = "b1", Title = "New Title" };
+            var input = new UpdateBookCommandInput { Id = "b1", Title = "New Title" };
             var updated = await service.UpdateBook(input);
             Assert.Equal("New Title", updated.Title);
         }
@@ -95,7 +97,7 @@ namespace Tests
             var loanRepo = A.Fake<ILoanRepository>();
             A.CallTo(() => repo.GetById("b2", A<CancellationToken>._)).Returns(Task.FromResult<Book?>(null));
             var service = new BookService(repo, loanRepo);
-            var input = new UpdateBook.UpdateBookCommandInput { Id = "b2", Title = "T" };
+            var input = new UpdateBookCommandInput { Id = "b2", Title = "T" };
             await Assert.ThrowsAsync<NotFoundException>(() => service.UpdateBook(input));
         }
 
@@ -114,7 +116,7 @@ namespace Tests
             A.CallTo(() => repo.Count(A<System.Linq.Expressions.Expression<Func<Book, bool>>>._, A<CancellationToken>._)).Returns(1);
 
             var service = new BookService(repo, loanRepo);
-            var input = new UpdateBook.UpdateBookCommandInput { Id = "b1", ISBN = "54321" };
+            var input = new UpdateBookCommandInput { Id = "b1", ISBN = "54321" };
 
             await Assert.ThrowsAsync<DuplicateException>(() => service.UpdateBook(input));
         }
@@ -149,7 +151,7 @@ namespace Tests
             book.Id = "book-1";
 
             A.CallTo(() => repo.GetById("book-1", A<CancellationToken>._)).Returns(Task.FromResult<Book?>(book));
-            A.CallTo(() => loanRepo.Filter(A<Application.Filters.LoanFilter>._, A<CancellationToken>._))
+            A.CallTo(() => loanRepo.Filter(A<LoanFilter>._, A<CancellationToken>._))
                 .Returns(new List<Loan> { new Loan { Id = "loan-1", BookId = "book-1", ReaderId = "r1" } });
 
             var service = new BookService(repo, loanRepo);
@@ -174,7 +176,7 @@ namespace Tests
             book.Id = "book-1";
 
             A.CallTo(() => repo.GetById("book-1", A<CancellationToken>._)).Returns(Task.FromResult<Book?>(book));
-            A.CallTo(() => loanRepo.Filter(A<Application.Filters.LoanFilter>._, A<CancellationToken>._)).Returns(new List<Loan>());
+            A.CallTo(() => loanRepo.Filter(A<LoanFilter>._, A<CancellationToken>._)).Returns(new List<Loan>());
             A.CallTo(() => repo.Delete("book-1", A<CancellationToken>._)).Returns(Task.FromResult(true));
 
             var service = new BookService(repo, loanRepo);
