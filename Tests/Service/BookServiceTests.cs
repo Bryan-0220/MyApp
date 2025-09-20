@@ -98,6 +98,26 @@ namespace Tests
             var input = new UpdateBook.UpdateBookCommandInput { Id = "b2", Title = "T" };
             await Assert.ThrowsAsync<NotFoundException>(() => service.UpdateBook(input));
         }
+
+        [Fact]
+        public async Task UpdateBook_ShouldThrowDuplicate_WhenIsbnUsedByAnother()
+        {
+            var repo = A.Fake<IBookRepository>();
+            var loanRepo = A.Fake<ILoanRepository>();
+            var book = Book.Create(new BookData { Title = "T", AuthorId = "a", CopiesAvailable = 1, Genre = "g", ISBN = "12345" });
+            book.Id = "b1";
+
+            var another = Book.Create(new BookData { Title = "X", AuthorId = "a", CopiesAvailable = 1, Genre = "g", ISBN = "54321" });
+            another.Id = "b2";
+
+            A.CallTo(() => repo.GetById("b1", A<CancellationToken>._)).Returns(Task.FromResult<Book?>(book));
+            A.CallTo(() => repo.Count(A<System.Linq.Expressions.Expression<Func<Book, bool>>>._, A<CancellationToken>._)).Returns(1);
+
+            var service = new BookService(repo, loanRepo);
+            var input = new UpdateBook.UpdateBookCommandInput { Id = "b1", ISBN = "54321" };
+
+            await Assert.ThrowsAsync<DuplicateException>(() => service.UpdateBook(input));
+        }
         [Fact]
         public async Task DeleteBook_ShouldReturnFail_WhenBookDoesNotExist()
         {

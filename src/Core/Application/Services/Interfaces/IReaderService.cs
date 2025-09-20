@@ -9,7 +9,7 @@ namespace Application.Readers.Services
         Task EnsureCanDelete(string readerId, CancellationToken ct = default);
         Task<Result<Reader>> DeleteReader(string readerId, CancellationToken ct = default);
         Task EnsureExists(string readerId, CancellationToken ct = default);
-        Task EnsureEmailNotInUse(string email, CancellationToken ct = default);
+        Task EnsureEmailNotInUse(string email, string? excludeId = null, CancellationToken ct = default);
         Task<Reader> CreateReader(ReaderData input, CancellationToken ct = default);
         Task<Reader> UpdateReader(UpdateReaderCommandInput input, CancellationToken ct = default);
     }

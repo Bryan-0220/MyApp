@@ -61,7 +61,7 @@ namespace Application.Readers.Services
 
         public async Task<Reader> CreateReader(ReaderData input, CancellationToken ct = default)
         {
-            await EnsureEmailNotInUse(input.Email!, ct);
+            await EnsureEmailNotInUse(input.Email!, null, ct);
             var reader = Reader.Create(input);
             var created = await _readerRepository.Create(reader, ct);
             return created;
@@ -71,6 +71,14 @@ namespace Application.Readers.Services
         {
             var existing = await _readerRepository.GetById(input.Id, ct);
             if (existing is null) throw new NotFoundException("Reader not found");
+
+            // If email is being updated, ensure it's not already used by another reader
+            static bool IsMeaningful(string? s) => !string.IsNullOrWhiteSpace(s) && s != "string";
+            if (IsMeaningful(input.Email))
+            {
+                var normalized = input.Email!.Trim();
+                await EnsureEmailNotInUse(normalized, input.Id, ct);
+            }
 
             ApplyAttributes(input, existing);
 
@@ -95,12 +103,17 @@ namespace Application.Readers.Services
                 existing.MembershipDate = input.MembershipDate.Value;
         }
 
-        public async Task EnsureEmailNotInUse(string email, CancellationToken ct = default)
+        public async Task EnsureEmailNotInUse(string email, string? excludeId = null, CancellationToken ct = default)
         {
             var filter = new ReaderFilter { Email = email };
             var results = await _readerRepository.Filter(filter, ct);
-            if (results != null && results.Any())
-                throw new DuplicateException("Email is already registered for another reader.");
+            if (results != null)
+            {
+                // If any result has a different Id than excludeId, it's a duplicate for our purposes
+                var hasOther = results.Any(r => !string.Equals(r.Id, excludeId, StringComparison.OrdinalIgnoreCase));
+                if (hasOther)
+                    throw new DuplicateException("Email is already registered for another reader.");
+            }
         }
 
         public async Task EnsureCanDelete(string readerId, CancellationToken ct = default)

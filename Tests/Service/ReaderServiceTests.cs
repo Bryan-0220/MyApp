@@ -96,6 +96,30 @@ namespace Tests
         }
 
         [Fact]
+        public async Task UpdateReader_ShouldThrowDuplicate_WhenEmailUsedByAnother()
+        {
+            var readerRepo = A.Fake<IReaderRepository>();
+            var loanRepo = A.Fake<ILoanRepository>();
+
+            // existing reader we want to update
+            var rd = new ReaderData { FirstName = "F", LastName = "L", Email = "old@x.com", MembershipDate = DateOnly.FromDateTime(System.DateTime.UtcNow) };
+            var reader = Reader.Create(rd);
+            reader.Id = "r-1";
+
+            // another reader already using the target email
+            var other = new Reader { Id = "r-2", FirstName = "A", LastName = "B", Email = "taken@x.com", MembershipDate = DateOnly.FromDateTime(System.DateTime.UtcNow) };
+
+            A.CallTo(() => readerRepo.GetById("r-1", A<CancellationToken>._)).Returns(Task.FromResult<Reader?>(reader));
+            A.CallTo(() => readerRepo.Filter(A<Application.Filters.ReaderFilter>._, A<CancellationToken>._)).Returns(new[] { other });
+
+            var service = new ReaderService(readerRepo, loanRepo);
+
+            var input = new UpdateReaderCommandInput { Id = "r-1", Email = "taken@x.com" };
+
+            await Assert.ThrowsAsync<DuplicateException>(() => service.UpdateReader(input));
+        }
+
+        [Fact]
         public async Task UpdateReader_ShouldThrowNotFound_WhenMissing()
         {
             var readerRepo = A.Fake<IReaderRepository>();

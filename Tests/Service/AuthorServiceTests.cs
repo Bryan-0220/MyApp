@@ -166,6 +166,31 @@ namespace Tests.Service
         }
 
         [Fact]
+        public async Task UpdateAuthor_ShouldThrowDuplicate_WhenNameUsedByAnother()
+        {
+            var repo = A.Fake<IAuthorRepository>();
+            var bookRepo = A.Fake<IBookRepository>();
+            var service = new AuthorService(repo, bookRepo);
+            var handler = new UpdateAuthorCommandHandler(
+                service,
+                A.Fake<FluentValidation.IValidator<UpdateAuthorCommandInput>>()
+            );
+
+            var author = Author.Create(new AuthorData { Name = "Old Name", Nationality = "Old", Genres = new[] { "Fiction" } });
+            author.Id = "id";
+
+            var another = Author.Create(new AuthorData { Name = "Taken Name", Nationality = "X", Genres = new[] { "Fiction" } });
+            another.Id = "other-id";
+
+            A.CallTo(() => repo.GetById("id", A<CancellationToken>._)).Returns(author);
+            A.CallTo(() => repo.Filter(A<Application.Filters.AuthorFilter>._, A<CancellationToken>._)).Returns(new[] { another });
+
+            var input = new UpdateAuthorCommandInput { Id = "id", Name = "Taken Name" };
+
+            await Assert.ThrowsAsync<DuplicateException>(() => handler.Handle(input, CancellationToken.None));
+        }
+
+        [Fact]
         public async Task GetAllAuthors_ShouldReturnList_WhenAuthorsExist()
         {
             var repo = A.Fake<IAuthorRepository>();

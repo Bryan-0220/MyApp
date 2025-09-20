@@ -77,6 +77,15 @@ namespace Application.Books.Services
             var existing = await _bookRepository.GetById(input.Id, ct);
             if (existing is null) throw new NotFoundException("Book not found");
 
+            // If ISBN is being updated, ensure it's not used by another book
+            static bool IsMeaningful(string? s) => !string.IsNullOrWhiteSpace(s) && s != "string";
+            if (IsMeaningful(input.ISBN))
+            {
+                var normalized = input.ISBN!.Trim();
+                var count = await _bookRepository.Count(b => b.ISBN == normalized && b.Id != input.Id, ct);
+                if (count > 0) throw new DuplicateException("Another book with the same ISBN already exists.");
+            }
+
             ApplyAttributes(input, existing);
 
             await _bookRepository.Update(existing, ct);

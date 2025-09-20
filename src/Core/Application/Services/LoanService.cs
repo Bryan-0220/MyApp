@@ -22,7 +22,7 @@ namespace Application.Loans.Services
             _readerService = readerService;
         }
 
-        public async Task EnsureNoDuplicateLoan(string bookId, string readerId, CancellationToken ct = default)
+        public async Task EnsureNoDuplicateLoan(string bookId, string readerId, string? excludeLoanId = null, CancellationToken ct = default)
         {
             var filter = new LoanFilter
             {
@@ -32,8 +32,12 @@ namespace Application.Loans.Services
             };
 
             var loans = await _loanRepository.Filter(filter, ct);
-            if (loans != null && loans.Any())
-                throw new DuplicateException("Reader already has this book on loan.");
+            if (loans != null)
+            {
+                var hasOther = loans.Any(l => !string.Equals(l.Id, excludeLoanId, StringComparison.OrdinalIgnoreCase));
+                if (hasOther)
+                    throw new DuplicateException("Reader already has this book on loan.");
+            }
         }
 
         public async Task<Result<Loan>> DeleteLoan(string loanId, CancellationToken ct = default)
@@ -68,7 +72,7 @@ namespace Application.Loans.Services
         {
             var book = await _bookService.GetBookOrThrow(data.BookId!, ct);
             await _readerService.EnsureExists(data.ReaderId!, ct);
-            await EnsureNoDuplicateLoan(data.BookId!, data.ReaderId!, ct);
+            await EnsureNoDuplicateLoan(data.BookId!, data.ReaderId!, null, ct);
             book.EnsureHasAvailableCopies();
         }
 
@@ -98,8 +102,22 @@ namespace Application.Loans.Services
             var existing = await _loanRepository.GetById(input.Id, ct);
             if (existing is null) throw new NotFoundException("Loan not found");
 
-            ApplyUpdates(input, existing);
+            // If BookId or ReaderId are being changed, ensure new references exist and there are no duplicate active loans
+            static bool IsMeaningful(string? s) => !string.IsNullOrWhiteSpace(s);
+            if (IsMeaningful(input.BookId) || IsMeaningful(input.ReaderId))
+            {
+                var targetBookId = IsMeaningful(input.BookId) ? input.BookId!.Trim() : existing.BookId;
+                var targetReaderId = IsMeaningful(input.ReaderId) ? input.ReaderId!.Trim() : existing.ReaderId;
 
+                // Ensure the book and reader exist
+                await _bookService.GetBookOrThrow(targetBookId, ct);
+                await _readerService.EnsureExists(targetReaderId, ct);
+
+                // Ensure no other active loan exists with same book+reader combination (exclude this loan)
+                await EnsureNoDuplicateLoan(targetBookId, targetReaderId, existing.Id, ct);
+            }
+
+            ApplyUpdates(input, existing);
             await _loanRepository.Update(existing, ct);
             return existing;
         }

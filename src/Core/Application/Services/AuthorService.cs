@@ -18,7 +18,7 @@ namespace Application.Authors.Services
             _bookRepository = bookRepository;
         }
 
-        public async Task EnsureCanCreate(string name, CancellationToken ct = default)
+        public async Task EnsureCanCreate(string name, string? excludeId = null, CancellationToken ct = default)
         {
             if (string.IsNullOrWhiteSpace(name)) throw new BusinessRuleException("Name is required");
 
@@ -28,8 +28,12 @@ namespace Application.Authors.Services
             };
 
             var existing = await _authorRepository.Filter(filter, ct);
-            if (existing != null && existing.Any())
-                throw new DuplicateException("An author with the same name already exists.");
+            if (existing != null)
+            {
+                var hasOther = existing.Any(a => !string.Equals(a.Id, excludeId, StringComparison.OrdinalIgnoreCase));
+                if (hasOther)
+                    throw new DuplicateException("An author with the same name already exists.");
+            }
         }
 
         public async Task EnsureCanDelete(string authorId, CancellationToken ct = default)
@@ -45,7 +49,7 @@ namespace Application.Authors.Services
 
         public async Task<Author> CreateAuthor(AuthorData input, CancellationToken ct)
         {
-            await EnsureCanCreate(input.Name, ct);
+            await EnsureCanCreate(input.Name, null, ct);
             var author = Author.Create(input);
             var created = await _authorRepository.Create(author, ct);
             return created;
@@ -56,6 +60,12 @@ namespace Application.Authors.Services
             var existing = await _authorRepository.GetById(input.Id, ct);
             if (existing is null)
                 throw new NotFoundException("Author not found");
+
+            // If the name is being changed, ensure no other author uses it
+            if (!string.IsNullOrWhiteSpace(input.Name) && input.Name != "string")
+            {
+                await EnsureCanCreate(input.Name.Trim(), input.Id, ct);
+            }
 
             ApplyAttributes(input, existing);
 
