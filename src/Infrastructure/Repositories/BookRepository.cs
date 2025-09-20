@@ -34,6 +34,36 @@ namespace Infrastructure.Repositories
 
             if (filter != null)
             {
+                if (!string.IsNullOrWhiteSpace(filter.Title))
+                {
+                    // case-insensitive contains match for title
+                    f = f & builder.Regex(b => b.Title, new MongoDB.Bson.BsonRegularExpression(filter.Title, "i"));
+                }
+
+                if (!string.IsNullOrWhiteSpace(filter.AuthorId))
+                {
+                    f = f & builder.Eq(b => b.AuthorId, filter.AuthorId);
+                }
+
+                if (!string.IsNullOrWhiteSpace(filter.Isbn))
+                {
+                    // ISBN stored in Book.ISBN; use equality match (normalized elsewhere)
+                    f = f & builder.Eq(b => b.ISBN, filter.Isbn);
+                }
+
+                if (filter.PublishedYear.HasValue)
+                {
+                    f = f & builder.Eq(b => b.PublishedYear, filter.PublishedYear.Value);
+                }
+
+                if (filter.Available.HasValue)
+                {
+                    if (filter.Available.Value)
+                        f = f & builder.Gt(b => b.CopiesAvailable, 0);
+                    else
+                        f = f & builder.Eq(b => b.CopiesAvailable, 0);
+                }
+
                 if (!string.IsNullOrWhiteSpace(filter.Genre))
                 {
                     f = f & builder.Regex(b => b.Genre, new MongoDB.Bson.BsonRegularExpression(filter.Genre, "i"));
