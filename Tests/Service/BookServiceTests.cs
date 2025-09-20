@@ -2,11 +2,102 @@ using Application.Books.Services;
 using Application.Interfaces;
 using Domain.Models;
 using FakeItEasy;
+using Domain.Common;
 
 namespace Tests
 {
     public class BookServiceTests
     {
+        [Fact]
+        public async Task GetBookOrThrow_ShouldReturnBook_WhenExists()
+        {
+            var repo = A.Fake<IBookRepository>();
+            var loanRepo = A.Fake<ILoanRepository>();
+            var book = Book.Create(new BookData { Title = "T", AuthorId = "a", CopiesAvailable = 1, Genre = "g" });
+            book.Id = "b1";
+            A.CallTo(() => repo.GetById("b1", A<CancellationToken>._)).Returns(Task.FromResult<Book?>(book));
+            var service = new BookService(repo, loanRepo);
+            var result = await service.GetBookOrThrow("b1");
+            Assert.Equal("b1", result.Id);
+        }
+
+        [Fact]
+        public async Task GetBookOrThrow_ShouldThrowNotFound_WhenMissing()
+        {
+            var repo = A.Fake<IBookRepository>();
+            var loanRepo = A.Fake<ILoanRepository>();
+            A.CallTo(() => repo.GetById("b2", A<CancellationToken>._)).Returns(Task.FromResult<Book?>(null));
+            var service = new BookService(repo, loanRepo);
+            await Assert.ThrowsAsync<NotFoundException>(() => service.GetBookOrThrow("b2"));
+        }
+
+        [Fact]
+        public async Task DecreaseCopiesOrThrow_ShouldSucceed_WhenCopiesAvailable()
+        {
+            var repo = A.Fake<IBookRepository>();
+            var loanRepo = A.Fake<ILoanRepository>();
+            A.CallTo(() => repo.TryChangeCopies("b1", -1, A<CancellationToken>._)).Returns(Task.FromResult(true));
+            var service = new BookService(repo, loanRepo);
+            await service.DecreaseCopiesOrThrow("b1");
+            A.CallTo(() => repo.TryChangeCopies("b1", -1, A<CancellationToken>._)).MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task DecreaseCopiesOrThrow_ShouldThrowBusinessRule_WhenNoCopies()
+        {
+            var repo = A.Fake<IBookRepository>();
+            var loanRepo = A.Fake<ILoanRepository>();
+            A.CallTo(() => repo.TryChangeCopies("b1", -1, A<CancellationToken>._)).Returns(Task.FromResult(false));
+            var service = new BookService(repo, loanRepo);
+            await Assert.ThrowsAsync<BusinessRuleException>(() => service.DecreaseCopiesOrThrow("b1"));
+        }
+
+        [Fact]
+        public async Task RestoreCopies_ShouldSucceed_WhenPossible()
+        {
+            var repo = A.Fake<IBookRepository>();
+            var loanRepo = A.Fake<ILoanRepository>();
+            A.CallTo(() => repo.TryChangeCopies("b1", 1, A<CancellationToken>._)).Returns(Task.FromResult(true));
+            var service = new BookService(repo, loanRepo);
+            await service.RestoreCopies("b1");
+            A.CallTo(() => repo.TryChangeCopies("b1", 1, A<CancellationToken>._)).MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task RestoreCopies_ShouldThrowBusinessRule_WhenFails()
+        {
+            var repo = A.Fake<IBookRepository>();
+            var loanRepo = A.Fake<ILoanRepository>();
+            A.CallTo(() => repo.TryChangeCopies("b1", 1, A<CancellationToken>._)).Returns(Task.FromResult(false));
+            var service = new BookService(repo, loanRepo);
+            await Assert.ThrowsAsync<BusinessRuleException>(() => service.RestoreCopies("b1"));
+        }
+
+        [Fact]
+        public async Task UpdateBook_ShouldUpdateAndReturn_WhenExists()
+        {
+            var repo = A.Fake<IBookRepository>();
+            var loanRepo = A.Fake<ILoanRepository>();
+            var book = Book.Create(new BookData { Title = "T", AuthorId = "a", CopiesAvailable = 1, Genre = "g" });
+            book.Id = "b1";
+            A.CallTo(() => repo.GetById("b1", A<CancellationToken>._)).Returns(Task.FromResult<Book?>(book));
+            A.CallTo(() => repo.Update(book, A<CancellationToken>._)).Returns(Task.FromResult(true));
+            var service = new BookService(repo, loanRepo);
+            var input = new UpdateBook.UpdateBookCommandInput { Id = "b1", Title = "New Title" };
+            var updated = await service.UpdateBook(input);
+            Assert.Equal("New Title", updated.Title);
+        }
+
+        [Fact]
+        public async Task UpdateBook_ShouldThrowNotFound_WhenMissing()
+        {
+            var repo = A.Fake<IBookRepository>();
+            var loanRepo = A.Fake<ILoanRepository>();
+            A.CallTo(() => repo.GetById("b2", A<CancellationToken>._)).Returns(Task.FromResult<Book?>(null));
+            var service = new BookService(repo, loanRepo);
+            var input = new UpdateBook.UpdateBookCommandInput { Id = "b2", Title = "T" };
+            await Assert.ThrowsAsync<NotFoundException>(() => service.UpdateBook(input));
+        }
         [Fact]
         public async Task DeleteBook_ShouldReturnFail_WhenBookDoesNotExist()
         {
