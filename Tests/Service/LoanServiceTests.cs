@@ -56,33 +56,55 @@ namespace Tests
             Assert.Equal("b1", result.BookId);
             Assert.Equal("r1", result.ReaderId);
             A.CallTo(() => repo.Create(A<Loan>._, A<CancellationToken>._)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => bookService.GetBookOrThrow("b1", A<CancellationToken>._)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => readerService.EnsureExists("r1", A<CancellationToken>._)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => bookService.DecreaseCopiesOrThrow("b1", A<CancellationToken>._)).MustHaveHappenedOnceExactly();
         }
 
-        [Theory]
-        [InlineData(typeof(NotFoundException))]
-        [InlineData(typeof(DuplicateException))]
-        [InlineData(typeof(BusinessRuleException))]
-        public async Task CreateLoan_ShouldThrow_WhenBusinessRuleFails(System.Type exceptionType)
+        [Fact]
+        public async Task CreateLoan_ShouldThrowNotFound_WhenBookMissing()
         {
             var repo = A.Fake<ILoanRepository>();
             var bookService = A.Fake<IBookService>();
             var readerService = A.Fake<IReaderService>();
             var data = new LoanData { BookId = "b1", ReaderId = "r1", LoanDate = System.DateOnly.FromDateTime(System.DateTime.UtcNow), DueDate = System.DateOnly.FromDateTime(System.DateTime.UtcNow.AddDays(7)) };
-            if (exceptionType == typeof(NotFoundException))
-                A.CallTo(() => bookService.GetBookOrThrow("b1", A<CancellationToken>._)).Throws(new NotFoundException("not found"));
-            else if (exceptionType == typeof(DuplicateException))
-                A.CallTo(() => repo.Filter(A<LoanFilter>._, A<CancellationToken>._)).Returns(new[] { new Loan() });
-            else if (exceptionType == typeof(BusinessRuleException))
-            {
-                var book = Book.Create(new BookData { Title = "T", AuthorId = "A", CopiesAvailable = 1, Genre = "G" });
-                book.Id = "b1";
-                A.CallTo(() => bookService.GetBookOrThrow("b1", A<CancellationToken>._)).Returns(book);
-                A.CallTo(() => readerService.EnsureExists("r1", A<CancellationToken>._)).Returns(Task.CompletedTask);
-                A.CallTo(() => repo.Filter(A<LoanFilter>._, A<CancellationToken>._)).Returns(new List<Loan>());
-                A.CallTo(() => bookService.DecreaseCopiesOrThrow("b1", A<CancellationToken>._)).Throws(new BusinessRuleException("no copies"));
-            }
+            A.CallTo(() => bookService.GetBookOrThrow("b1", A<CancellationToken>._)).Throws(new NotFoundException("not found"));
             var service = new LoanService(repo, bookService, readerService);
-            await Assert.ThrowsAsync(exceptionType, () => service.CreateLoan(data));
+            await Assert.ThrowsAsync<NotFoundException>(() => service.CreateLoan(data));
+        }
+
+        [Fact]
+        public async Task CreateLoan_ShouldThrowDuplicate_WhenExistingLoan()
+        {
+            var repo = A.Fake<ILoanRepository>();
+            var bookService = A.Fake<IBookService>();
+            var readerService = A.Fake<IReaderService>();
+            var data = new LoanData { BookId = "b1", ReaderId = "r1", LoanDate = System.DateOnly.FromDateTime(System.DateTime.UtcNow), DueDate = System.DateOnly.FromDateTime(System.DateTime.UtcNow.AddDays(7)) };
+            // The service calls GetBookOrThrow and EnsureExists before checking duplicates, so fake them
+            var book = Book.Create(new BookData { Title = "T", AuthorId = "A", CopiesAvailable = 1, Genre = "G" });
+            book.Id = "b1";
+            A.CallTo(() => bookService.GetBookOrThrow("b1", A<CancellationToken>._)).Returns(book);
+            A.CallTo(() => readerService.EnsureExists("r1", A<CancellationToken>._)).Returns(Task.CompletedTask);
+            A.CallTo(() => repo.Filter(A<LoanFilter>._, A<CancellationToken>._)).Returns(new[] { new Loan() });
+            var service = new LoanService(repo, bookService, readerService);
+            await Assert.ThrowsAsync<DuplicateException>(() => service.CreateLoan(data));
+        }
+
+        [Fact]
+        public async Task CreateLoan_ShouldThrowBusinessRule_WhenNoCopies()
+        {
+            var repo = A.Fake<ILoanRepository>();
+            var bookService = A.Fake<IBookService>();
+            var readerService = A.Fake<IReaderService>();
+            var data = new LoanData { BookId = "b1", ReaderId = "r1", LoanDate = System.DateOnly.FromDateTime(System.DateTime.UtcNow), DueDate = System.DateOnly.FromDateTime(System.DateTime.UtcNow.AddDays(7)) };
+            var book = Book.Create(new BookData { Title = "T", AuthorId = "A", CopiesAvailable = 1, Genre = "G" });
+            book.Id = "b1";
+            A.CallTo(() => bookService.GetBookOrThrow("b1", A<CancellationToken>._)).Returns(book);
+            A.CallTo(() => readerService.EnsureExists("r1", A<CancellationToken>._)).Returns(Task.CompletedTask);
+            A.CallTo(() => repo.Filter(A<LoanFilter>._, A<CancellationToken>._)).Returns(new List<Loan>());
+            A.CallTo(() => bookService.DecreaseCopiesOrThrow("b1", A<CancellationToken>._)).Throws(new BusinessRuleException("no copies"));
+            var service = new LoanService(repo, bookService, readerService);
+            await Assert.ThrowsAsync<BusinessRuleException>(() => service.CreateLoan(data));
         }
 
         [Fact]
@@ -94,11 +116,19 @@ namespace Tests
             var loan = new Loan { Id = "l1", BookId = "b1", ReaderId = "r1" };
             A.CallTo(() => repo.GetById("l1", A<CancellationToken>._)).Returns(Task.FromResult<Loan?>(loan));
             A.CallTo(() => repo.Update(loan, A<CancellationToken>._)).Returns(Task.FromResult(true));
+            // When updating BookId, the service validates target book and reader exist
+            var targetBook = Book.Create(new BookData { Title = "T2", AuthorId = "A", CopiesAvailable = 1, Genre = "G" });
+            targetBook.Id = "b2";
+            A.CallTo(() => bookService.GetBookOrThrow("b2", A<CancellationToken>._)).Returns(targetBook);
+            A.CallTo(() => readerService.EnsureExists("r1", A<CancellationToken>._)).Returns(Task.CompletedTask);
+
             var service = new LoanService(repo, bookService, readerService);
             var input = new UpdateLoanCommandInput { Id = "l1", BookId = "b2" };
             var updated = await service.UpdateLoan(input);
             Assert.Equal("b2", updated.BookId);
             A.CallTo(() => repo.Update(A<Loan>.That.Matches(l => l.Id == "l1" && l.BookId == "b2"), A<CancellationToken>._)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => bookService.GetBookOrThrow("b2", A<CancellationToken>._)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => readerService.EnsureExists("r1", A<CancellationToken>._)).MustHaveHappenedOnceExactly();
         }
 
         [Fact]
@@ -113,30 +143,38 @@ namespace Tests
             await Assert.ThrowsAsync<NotFoundException>(() => service.UpdateLoan(input));
         }
 
-        [Theory]
-        [InlineData(false, false, "Cannot delete an active or overdue loan. Mark it as returned before deletion.")]
-        [InlineData(true, true, "Loan deleted.")]
-        public async Task DeleteLoan_ShouldHandleCanBeDeleted(bool canBeDeleted, bool expectedSuccess, string expectedMessage)
+        [Fact]
+        public async Task DeleteLoan_ShouldReturnFail_WhenLoanIsActiveOrOverdue()
         {
             var repo = A.Fake<ILoanRepository>();
             var bookService = A.Fake<IBookService>();
             var readerService = A.Fake<IReaderService>();
-            var loan = new Loan { Id = "l3", BookId = "b3", ReaderId = "r3", Status = canBeDeleted ? LoanStatus.Returned : LoanStatus.Active };
+            var loan = new Loan { Id = "l3", BookId = "b3", ReaderId = "r3", Status = LoanStatus.Active };
             A.CallTo(() => repo.GetById("l3", A<CancellationToken>._)).Returns(Task.FromResult<Loan?>(loan));
-            if (canBeDeleted)
-            {
-                A.CallTo(() => bookService.RestoreCopies(A<string>._, A<CancellationToken>._)).Returns(Task.CompletedTask);
-                A.CallTo(() => repo.Delete("l3", A<CancellationToken>._)).Returns(Task.FromResult(true));
-            }
             var service = new LoanService(repo, bookService, readerService);
             var result = await service.DeleteLoan("l3");
-            Assert.Equal(expectedSuccess, result.Success);
-            Assert.Equal(expectedMessage, result.Message);
-            if (canBeDeleted)
-            {
-                A.CallTo(() => bookService.RestoreCopies("b3", A<CancellationToken>._)).MustHaveHappenedOnceExactly();
-                A.CallTo(() => repo.Delete("l3", A<CancellationToken>._)).MustHaveHappenedOnceExactly();
-            }
+            Assert.False(result.Success);
+            Assert.Equal("Cannot delete an active or overdue loan. Mark it as returned before deletion.", result.Message);
+            A.CallTo(() => bookService.RestoreCopies(A<string>._, A<CancellationToken>._)).MustNotHaveHappened();
+            A.CallTo(() => repo.Delete(A<string>._, A<CancellationToken>._)).MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task DeleteLoan_ShouldDeleteAndRestoreCopies_WhenLoanIsReturned()
+        {
+            var repo = A.Fake<ILoanRepository>();
+            var bookService = A.Fake<IBookService>();
+            var readerService = A.Fake<IReaderService>();
+            var loan = new Loan { Id = "l3", BookId = "b3", ReaderId = "r3", Status = LoanStatus.Returned };
+            A.CallTo(() => repo.GetById("l3", A<CancellationToken>._)).Returns(Task.FromResult<Loan?>(loan));
+            A.CallTo(() => bookService.RestoreCopies(A<string>._, A<CancellationToken>._)).Returns(Task.CompletedTask);
+            A.CallTo(() => repo.Delete("l3", A<CancellationToken>._)).Returns(Task.FromResult(true));
+            var service = new LoanService(repo, bookService, readerService);
+            var result = await service.DeleteLoan("l3");
+            Assert.True(result.Success);
+            Assert.Equal("Loan deleted.", result.Message);
+            A.CallTo(() => bookService.RestoreCopies("b3", A<CancellationToken>._)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => repo.Delete("l3", A<CancellationToken>._)).MustHaveHappenedOnceExactly();
         }
 
         [Fact]
