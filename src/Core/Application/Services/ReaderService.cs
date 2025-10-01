@@ -106,11 +106,20 @@ namespace Application.Readers.Services
         {
             var filter = new ReaderFilter { Email = email };
             var results = await _readerRepository.Filter(filter, ct);
-            if (results != null)
+            if (results != null && results.Any())
             {
+                // Si excludeId es null (creando nuevo reader), cualquier resultado significa duplicado
+                if (excludeId == null)
+                {
+                    throw new DuplicateException("Email is already registered for another reader.");
+                }
+
+                // Si excludeId no es null (actualizando reader), verificar si hay otros readers con el mismo email
                 var hasOther = results.Any(r => !string.Equals(r.Id, excludeId, StringComparison.OrdinalIgnoreCase));
                 if (hasOther)
+                {
                     throw new DuplicateException("Email is already registered for another reader.");
+                }
             }
         }
 

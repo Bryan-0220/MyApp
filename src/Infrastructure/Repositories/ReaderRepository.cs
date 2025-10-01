@@ -4,6 +4,7 @@ using Application.Filters;
 using Application.Interfaces;
 using MongoDB.Driver;
 using MongoDB.Bson;
+using System.Text.RegularExpressions;
 
 namespace Infrastructure.Repositories
 {
@@ -40,6 +41,15 @@ namespace Infrastructure.Repositories
 
                 if (!string.IsNullOrWhiteSpace(filter.LastName))
                     f = f & builder.Regex(r => r.LastName, new BsonRegularExpression(filter.LastName, "i"));
+
+                // If Email is provided, match it exactly but case-insensitive.
+                // Use Regex with anchors and escape the value to avoid special chars being interpreted.
+                if (!string.IsNullOrWhiteSpace(filter.Email))
+                {
+                    var escaped = Regex.Escape(filter.Email!);
+                    var pattern = $"^{escaped}$";
+                    f = f & builder.Regex(r => r.Email, new BsonRegularExpression(pattern, "i"));
+                }
             }
 
             var cursor = await _readers.FindAsync(f, cancellationToken: ct);
