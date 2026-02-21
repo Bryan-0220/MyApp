@@ -4,6 +4,7 @@ using Application.Filters;
 using Application.Interfaces;
 using MongoDB.Driver;
 using MongoDB.Bson;
+using System.Text.RegularExpressions;
 
 namespace Infrastructure.Repositories
 {
@@ -16,19 +17,19 @@ namespace Infrastructure.Repositories
             _readers = database.GetCollection<Reader>("readers");
         }
 
-        public async Task<Reader> CreateAsync(Reader entity, CancellationToken ct = default)
+        public async Task<Reader> Create(Reader entity, CancellationToken ct = default)
         {
             await _readers.InsertOneAsync(entity, cancellationToken: ct);
             return entity;
         }
 
-        public async Task<bool> DeleteAsync(string id, CancellationToken ct = default)
+        public async Task<bool> Delete(string id, CancellationToken ct = default)
         {
             var res = await _readers.DeleteOneAsync(r => r.Id == id, ct);
             return res.DeletedCount > 0;
         }
 
-        public async Task<IEnumerable<Reader>> FilterAsync(ReaderFilter? filter = null, CancellationToken ct = default)
+        public async Task<IEnumerable<Reader>> Filter(ReaderFilter? filter = null, CancellationToken ct = default)
         {
             var builder = Builders<Reader>.Filter;
             var f = builder.Empty;
@@ -40,51 +41,55 @@ namespace Infrastructure.Repositories
 
                 if (!string.IsNullOrWhiteSpace(filter.LastName))
                     f = f & builder.Regex(r => r.LastName, new BsonRegularExpression(filter.LastName, "i"));
+
+                // If Email is provided, match it exactly but case-insensitive.
+                // Use Regex with anchors and escape the value to avoid special chars being interpreted.
+                if (!string.IsNullOrWhiteSpace(filter.Email))
+                {
+                    var escaped = Regex.Escape(filter.Email!);
+                    var pattern = $"^{escaped}$";
+                    f = f & builder.Regex(r => r.Email, new BsonRegularExpression(pattern, "i"));
+                }
             }
 
             var cursor = await _readers.FindAsync(f, cancellationToken: ct);
             return await cursor.ToListAsync(ct);
         }
 
-        public async Task<IEnumerable<Reader>> GetAllAsync(CancellationToken ct = default)
+        public async Task<IEnumerable<Reader>> GetAll(CancellationToken ct = default)
         {
             var cursor = await _readers.FindAsync(Builders<Reader>.Filter.Empty, cancellationToken: ct);
             return await cursor.ToListAsync(ct);
         }
 
-        public async Task<Reader?> GetByIdAsync(string id, CancellationToken ct = default)
+        public async Task<Reader?> GetById(string id, CancellationToken ct = default)
         {
             var cursor = await _readers.FindAsync(r => r.Id == id, cancellationToken: ct);
             return await cursor.FirstOrDefaultAsync(ct);
         }
 
-        public async Task<long> CountAsync(Expression<Func<Reader, bool>>? predicate = null, CancellationToken ct = default)
+        public async Task<long> Count(Expression<Func<Reader, bool>>? predicate = null, CancellationToken ct = default)
         {
             if (predicate == null) return await _readers.CountDocumentsAsync(Builders<Reader>.Filter.Empty, cancellationToken: ct);
             return await _readers.CountDocumentsAsync(Builders<Reader>.Filter.Where(predicate), cancellationToken: ct);
         }
 
-        public async Task<IEnumerable<Reader>> ListAsync(CancellationToken ct = default)
+        public async Task<IEnumerable<Reader>> List(CancellationToken ct = default)
         {
-            return await GetAllAsync(ct);
+            return await GetAll(ct);
         }
 
-        public async Task<bool> UpdateAsync(string id, Reader entity, CancellationToken ct = default)
+        public async Task<bool> Update(Reader reader, CancellationToken ct = default)
         {
             try
             {
-                var res = await _readers.ReplaceOneAsync(r => r.Id == id, entity, cancellationToken: ct);
+                var res = await _readers.ReplaceOneAsync(r => r.Id == reader.Id, reader, cancellationToken: ct);
                 return res.ModifiedCount > 0 || res.MatchedCount > 0;
             }
             catch (MongoWriteException ex) when (ex.WriteError?.Category == ServerErrorCategory.DuplicateKey)
             {
                 throw new InvalidOperationException("Duplicate key in readers collection.");
             }
-        }
-
-        public async Task UpdateAsync(Reader entity, CancellationToken ct = default)
-        {
-            await UpdateAsync(entity.Id, entity, ct);
         }
     }
 }

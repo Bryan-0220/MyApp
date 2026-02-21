@@ -2,6 +2,6 @@ namespace FilterReaders
 {
     public interface IFilterReadersQueryHandler
     {
-        Task<IEnumerable<FilterReadersQueryOutput>> HandleAsync(FilterReadersQueryInput input, CancellationToken ct = default);
+        Task<IEnumerable<FilterReadersQueryOutput>> Handle(FilterReadersQueryInput input, CancellationToken ct = default);
     }
 }

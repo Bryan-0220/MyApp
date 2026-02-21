@@ -5,6 +5,6 @@ namespace Application.Interfaces
 {
     public interface IAuthorRepository : IRepository<Author>
     {
-        Task<IEnumerable<Author>> FilterAsync(AuthorFilter? filter = null, CancellationToken ct = default);
+        Task<IEnumerable<Author>> Filter(AuthorFilter? filter = null, CancellationToken ct = default);
     }
 }

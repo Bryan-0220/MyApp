@@ -1,51 +1,29 @@
+using Application.Interfaces;
+using Application.Authors.Mappers;
+using FluentValidation;
+using Application.Authors.Services;
 using Domain.Models;
 using Domain.Common;
-using Application.Interfaces;
-using FluentValidation;
 
 namespace CreateAuthor
 {
     public class CreateAuthorCommandHandler : ICreateAuthorCommandHandler
     {
-        private readonly IAuthorRepository _authorRepository;
         private readonly IValidator<CreateAuthorCommandInput> _validator;
         private readonly IAuthorCreationService _creationService;
 
-        public CreateAuthorCommandHandler(IAuthorRepository authorRepository, IValidator<CreateAuthorCommandInput> validator, Application.Authors.Services.IAuthorCreationService creationService)
+        public CreateAuthorCommandHandler(IValidator<CreateAuthorCommandInput> validator, Application.Authors.Services.IAuthorService authorService)
         {
-            _authorRepository = authorRepository;
             _validator = validator;
-            _creationService = creationService;
+            _authorService = authorService;
         }
 
-        public async Task<CreateAuthorCommandOutput> HandleAsync(CreateAuthorCommandInput input, CancellationToken ct = default)
+        public async Task<CreateAuthorCommandOutput> Handle(CreateAuthorCommandInput input, CancellationToken ct = default)
         {
             await _validator.ValidateAndThrowAsync(input, ct);
-
-            Author author;
-            try
-            {
-                await _creationService.EnsureCanCreateAsync(input.Name, ct);
-
-                author = Author.Create(input.Name, input.Bio, input.Nationality, input.BirthDate, input.DeathDate, input.Genres);
-            }
-            catch (DomainException ex)
-            {
-                throw new InvalidOperationException(ex.Message);
-            }
-
-            var created = await _authorRepository.CreateAsync(author, ct);
-
-            return new CreateAuthorCommandOutput
-            {
-                Id = created.Id,
-                Name = created.Name,
-                Bio = created.Bio,
-                Nationality = string.IsNullOrWhiteSpace(created.Nationality) ? null : created.Nationality,
-                BirthDate = created.BirthDate,
-                DeathDate = created.DeathDate,
-                Genres = (created.Genres == null) ? Array.Empty<string>() : Enumerable.ToArray(created.Genres)
-            };
+            var created = await _authorService.CreateAuthor(input.ToData(), ct);
+            return created.ToCreateAuthorOutput();
         }
+
     }
 }

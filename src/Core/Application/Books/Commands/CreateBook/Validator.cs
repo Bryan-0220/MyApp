@@ -22,7 +22,7 @@ namespace CreateBook
                 .NotEmpty()
                 .MustAsync(async (isbn, ct) =>
                 {
-                    var exists = await _bookRepository.CountAsync(b => b.ISBN == isbn, ct);
+                    var exists = await _bookRepository.Count(b => b.ISBN == isbn, ct);
                     return exists == 0;
                 })
                 .WithMessage("Ya existe un libro con ese ISBN.");

@@ -1,4 +1,6 @@
 using Application.Interfaces;
+using Application.Authors.Mappers;
+using Domain.Results;
 
 namespace GetAuthorById
 {
@@ -11,21 +13,11 @@ namespace GetAuthorById
             _authorRepository = authorRepository;
         }
 
-        public async Task<GetAuthorByIdQueryOutput?> HandleAsync(GetAuthorByIdQueryInput query, CancellationToken ct = default)
+        public async Task<Result<GetAuthorByIdQueryOutput>> Handle(GetAuthorByIdQueryInput query, CancellationToken ct = default)
         {
-            var author = await _authorRepository.GetByIdAsync(query.Id, ct);
-            if (author is null) return null;
-
-            return new GetAuthorByIdQueryOutput
-            {
-                Id = author.Id,
-                Name = author.Name,
-                Bio = author.Bio,
-                Nationality = string.IsNullOrWhiteSpace(author.Nationality) ? null : author.Nationality,
-                BirthDate = author.BirthDate,
-                DeathDate = author.DeathDate,
-                Genres = author.Genres == null ? Array.Empty<string>() : Enumerable.ToArray(author.Genres)
-            };
+            var author = await _authorRepository.GetById(query.Id, ct);
+            if (author is null) return Result<GetAuthorByIdQueryOutput>.Fail("Author not found");
+            return Result<GetAuthorByIdQueryOutput>.Ok(author.ToGetAuthorByIdOutput());
         }
     }
 }

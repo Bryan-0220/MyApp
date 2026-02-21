@@ -1,4 +1,6 @@
 using Application.Interfaces;
+using Domain.Results;
+using Application.Loans.Mappers;
 
 namespace GetLoanById
 {
@@ -11,21 +13,11 @@ namespace GetLoanById
             _loanRepository = loanRepository;
         }
 
-        public async Task<GetLoanByIdQueryOutput?> HandleAsync(GetLoanByIdQueryInput query, CancellationToken ct = default)
+        public async Task<Result<GetLoanByIdQueryOutput>> Handle(GetLoanByIdQueryInput query, CancellationToken ct = default)
         {
-            var loan = await _loanRepository.GetByIdAsync(query.Id, ct);
-            if (loan is null) return null;
-
-            return new GetLoanByIdQueryOutput
-            {
-                Id = loan.Id,
-                BookId = loan.BookId,
-                ReaderId = loan.ReaderId,
-                LoanDate = loan.LoanDate,
-                DueDate = loan.DueDate,
-                ReturnedDate = loan.ReturnedDate,
-                Status = loan.Status.ToString()
-            };
+            var loan = await _loanRepository.GetById(query.Id, ct);
+            if (loan is null) return Result<GetLoanByIdQueryOutput>.Fail("Loan not found");
+            return Result<GetLoanByIdQueryOutput>.Ok(loan.ToGetLoanByIdOutput());
         }
     }
 }

@@ -2,6 +2,6 @@ namespace CreateBook
 {
     public interface ICreateBookCommandHandler
     {
-        Task<CreateBookCommandOutput> HandleAsync(CreateBookCommandInput input, CancellationToken ct = default);
+        Task<CreateBookCommandOutput> Handle(CreateBookCommandInput input, CancellationToken ct = default);
     }
 }

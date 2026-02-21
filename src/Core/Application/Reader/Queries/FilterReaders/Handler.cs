@@ -1,6 +1,7 @@
 using Application.Interfaces;
 using Application.Filters;
 using FluentValidation;
+using Application.Readers.Mappers;
 
 namespace FilterReaders
 {
@@ -15,26 +16,12 @@ namespace FilterReaders
             _validator = validator;
         }
 
-        public async Task<IEnumerable<FilterReadersQueryOutput>> HandleAsync(FilterReadersQueryInput input, CancellationToken ct = default)
+        public async Task<IEnumerable<FilterReadersQueryOutput>> Handle(FilterReadersQueryInput input, CancellationToken ct = default)
         {
             await _validator.ValidateAndThrowAsync(input, ct);
-
-            var rf = new ReaderFilter
-            {
-                FirstName = input.FirstName,
-                LastName = input.LastName
-            };
-
-            var readers = await _readerRepository.FilterAsync(rf, ct);
-
-            return readers.Select(r => new FilterReadersQueryOutput
-            {
-                Id = r.Id,
-                FirstName = r.FirstName,
-                LastName = r.LastName,
-                Email = r.Email,
-                MembershipDate = r.MembershipDate
-            });
+            var filter = ReaderFilter.Create(input.FirstName, input.LastName);
+            var readers = await _readerRepository.Filter(filter, ct);
+            return readers.Select(reader => reader.ToFilterReadersOutput());
         }
     }
 }

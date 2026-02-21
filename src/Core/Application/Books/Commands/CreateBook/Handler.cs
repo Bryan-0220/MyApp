@@ -1,7 +1,7 @@
-using Domain.Models;
-using Domain.Common;
 using Application.Interfaces;
+using Application.Books.Mappers;
 using FluentValidation;
+using Domain.Models;
 
 namespace CreateBook
 {
@@ -16,33 +16,12 @@ namespace CreateBook
             _validator = validator;
         }
 
-        public async Task<CreateBookCommandOutput> HandleAsync(CreateBookCommandInput input, CancellationToken ct = default)
+        public async Task<CreateBookCommandOutput> Handle(CreateBookCommandInput input, CancellationToken ct = default)
         {
             await _validator.ValidateAndThrowAsync(input, ct);
-
-            Book book;
-            try
-            {
-                book = Book.Create(input.Title, input.AuthorId, input.ISBN, input.PublishedYear, input.CopiesAvailable, input.Genre);
-            }
-            catch (DomainException ex)
-            {
-                throw new InvalidOperationException(ex.Message);
-            }
-
-            var created = await _bookRepository.CreateAsync(book, ct);
-
-            return new CreateBookCommandOutput
-            {
-                Id = created.Id,
-                Title = created.Title,
-                AuthorId = created.AuthorId,
-                ISBN = created.ISBN,
-                PublishedYear = created.PublishedYear,
-                CopiesAvailable = created.CopiesAvailable,
-                Genre = created.Genre
-
-            };
+            var book = Book.Create(input.ToData());
+            var created = await _bookRepository.Create(book, ct);
+            return created.ToCreateBookOutput();
         }
     }
 }

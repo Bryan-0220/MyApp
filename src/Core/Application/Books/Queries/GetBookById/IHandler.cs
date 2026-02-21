@@ -1,7 +1,9 @@
+using Domain.Results;
+
 namespace GetBookById
 {
     public interface IGetBookByIdQueryHandler
     {
-        Task<GetBookByIdQueryOutput?> HandleAsync(GetBookByIdQueryInput query, CancellationToken ct);
+        Task<Result<GetBookByIdQueryOutput>> Handle(GetBookByIdQueryInput query, CancellationToken ct);
     }
 }

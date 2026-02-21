@@ -2,7 +2,8 @@ namespace DeleteLoan
 {
     public class DeleteLoanCommandOutput
     {
-        public bool Deleted { get; set; }
+        public bool Success { get; set; }
         public string? Message { get; set; }
+        public string? LoanId { get; set; }
     }
 }

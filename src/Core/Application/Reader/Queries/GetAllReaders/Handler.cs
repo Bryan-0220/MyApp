@@ -1,4 +1,5 @@
 using Application.Interfaces;
+using Application.Readers.Mappers;
 
 namespace GetAllReaders
 {
@@ -11,20 +12,10 @@ namespace GetAllReaders
             _readerRepository = readerRepository;
         }
 
-        public async Task<IEnumerable<GetAllReadersQueryOutput>> HandleAsync(GetAllReadersQueryInput query, CancellationToken ct = default)
+        public async Task<IEnumerable<GetAllReadersQueryOutput>> Handle(GetAllReadersQueryInput query, CancellationToken ct = default)
         {
-            var users = await _readerRepository.GetAllAsync(ct);
-
-            var projected = users.Select(r => new GetAllReadersQueryOutput
-            {
-                Id = r.Id,
-                FirstName = r.FirstName,
-                LastName = r.LastName,
-                Email = r.Email,
-                MembershipDate = r.MembershipDate
-            });
-
-            return projected;
+            var readers = await _readerRepository.GetAll(ct);
+            return readers.Select(reader => reader.ToGetAllReadersOutput());
         }
     }
 }

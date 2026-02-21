@@ -5,12 +5,9 @@ namespace UpdateReader
 {
     public class UpdateReaderCommandValidator : AbstractValidator<UpdateReaderCommandInput>
     {
-        private readonly IReaderRepository _readerRepository;
 
-        public UpdateReaderCommandValidator(IReaderRepository readerRepository)
+        public UpdateReaderCommandValidator()
         {
-            _readerRepository = readerRepository;
-
             RuleFor(x => x.Id)
                 .NotEmpty().WithMessage("Id is required");
 

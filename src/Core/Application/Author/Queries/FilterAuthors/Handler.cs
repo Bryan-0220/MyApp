@@ -1,6 +1,7 @@
 using Application.Interfaces;
 using FluentValidation;
 using Application.Filters;
+using Application.Authors.Mappers;
 
 namespace FilterAuthors
 {
@@ -15,30 +16,12 @@ namespace FilterAuthors
             _validator = validator;
         }
 
-        public async Task<IEnumerable<FilterAuthorsQueryOutput>> HandleAsync(FilterAuthorsQueryInput input, CancellationToken ct = default)
+        public async Task<IEnumerable<FilterAuthorsQueryOutput>> Handle(FilterAuthorsQueryInput input, CancellationToken ct = default)
         {
             await _validator.ValidateAndThrowAsync(input, ct);
-
-            var cleanedGenres = input.Genres?.Where(g => !string.IsNullOrWhiteSpace(g)).Select(g => g.Trim()).ToArray();
-
-            var filter = new AuthorFilter
-            {
-                Name = input.Name?.Trim(),
-                Genres = cleanedGenres != null && cleanedGenres.Length > 0 ? cleanedGenres : null
-            };
-
-            var authors = await _authorRepository.FilterAsync(filter, ct);
-
-            return authors.Select(a => new FilterAuthorsQueryOutput
-            {
-                Id = a.Id,
-                Name = a.Name,
-                Bio = a.Bio,
-                Nationality = string.IsNullOrWhiteSpace(a.Nationality) ? null : a.Nationality,
-                BirthDate = a.BirthDate,
-                DeathDate = a.DeathDate,
-                Genres = a.Genres == null ? Array.Empty<string>() : Enumerable.ToArray(a.Genres)
-            });
+            var filter = AuthorFilter.Create(input.Name, input.Genres);
+            var authors = await _authorRepository.Filter(filter, ct);
+            return authors.Select(author => author.ToFilterAuthorsOutput());
         }
     }
 }

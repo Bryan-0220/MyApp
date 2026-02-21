@@ -28,6 +28,7 @@ using UpdateReader;
 using GetAllReaders;
 using GetReaderById;
 using FilterReaders;
+using EntryPoint.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -52,9 +53,7 @@ builder.Services.AddScoped<IReaderRepository, ReaderRepository>();
 
 builder.Services.AddScoped<ILoanRepository, LoanRepository>();
 
-builder.Services.AddScoped<Application.Books.Services.IBookDeletionService, Application.Books.Services.BookDeletionService>();
-builder.Services.AddScoped<Application.Readers.Services.IReaderDeletionService, Application.Readers.Services.ReaderDeletionService>();
-builder.Services.AddScoped<Application.Authors.Services.IAuthorDeletionService, Application.Authors.Services.AuthorDeletionService>();
+builder.Services.AddScoped<Application.Authors.Services.IAuthorService, Application.Authors.Services.AuthorService>();
 
 builder.Services.AddScoped<ICreateLoanCommandHandler, CreateLoanCommandHandler>();
 builder.Services.AddScoped<IGetLoanByIdQueryHandler, GetLoanByIdQueryHandler>();
@@ -108,9 +107,8 @@ builder.Services.AddScoped<IValidator<FilterBooksQueryInput>, FilterBooksQueryVa
 builder.Services.AddScoped<Application.Books.Services.IBookService, Application.Books.Services.BookService>();
 builder.Services.AddScoped<Application.Readers.Services.IReaderService, Application.Readers.Services.ReaderService>();
 builder.Services.AddScoped<Application.Loans.Services.ILoanService, Application.Loans.Services.LoanService>();
-builder.Services.AddScoped<Application.Loans.Services.IDeleteService, Application.Loans.Services.DeleteService>();
 // Author services
-builder.Services.AddScoped<Application.Authors.Services.IAuthorCreationService, Application.Authors.Services.AuthorCreationService>();
+builder.Services.AddScoped<Application.Authors.Services.IAuthorService, Application.Authors.Services.AuthorService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -125,6 +123,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Global exception handling middleware (maps DomainException -> 400, logs others)
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseAuthorization();
 

@@ -1,6 +1,7 @@
 using Application.Interfaces;
 using Application.Filters;
 using FluentValidation;
+using Application.Books.Mappers;
 
 namespace FilterBooks
 {
@@ -15,28 +16,12 @@ namespace FilterBooks
             _validator = validator;
         }
 
-        public async Task<IEnumerable<FilterBooksQueryOutput>> HandleAsync(FilterBooksQueryInput input, CancellationToken ct = default)
+        public async Task<IEnumerable<FilterBooksQueryOutput>> Handle(FilterBooksQueryInput input, CancellationToken ct = default)
         {
             await _validator.ValidateAndThrowAsync(input, ct);
-
-            var genre = string.IsNullOrWhiteSpace(input.Genre) ? null : input.Genre;
-            var filter = new BookFilter
-            {
-                Genre = genre
-            };
-
-            var books = await _bookRepository.FilterAsync(filter, ct);
-
-            return books.Select(book => new FilterBooksQueryOutput
-            {
-                Id = book.Id,
-                Title = book.Title,
-                AuthorId = book.AuthorId,
-                ISBN = book.ISBN,
-                PublishedYear = book.PublishedYear,
-                CopiesAvailable = book.CopiesAvailable,
-                Genre = book.Genre
-            });
+            var filter = BookFilter.Create(genre: input.Genre);
+            var books = await _bookRepository.Filter(filter, ct);
+            return books.Select(book => book.ToFilterBooksOutput());
         }
     }
 }
