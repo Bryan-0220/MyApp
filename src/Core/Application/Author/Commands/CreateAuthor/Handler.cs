@@ -9,7 +9,7 @@ namespace CreateAuthor
     {
         private readonly IAuthorRepository _authorRepository;
         private readonly IValidator<CreateAuthorCommandInput> _validator;
-        private readonly Application.Authors.Services.IAuthorCreationService _creationService;
+        private readonly IAuthorCreationService _creationService;
 
         public CreateAuthorCommandHandler(IAuthorRepository authorRepository, IValidator<CreateAuthorCommandInput> validator, Application.Authors.Services.IAuthorCreationService creationService)
         {
